@@ -1,0 +1,297 @@
+@extends('layouts.app')
+
+@section('title', 'Carga de Datos - Porto Admin')
+@section('page_title', 'Carga de Datos')
+
+@section('content')
+    @include('partials.modules')
+
+    <!-- Filter Bar -->
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <div class="panel-body">
+                    <div class="row align-items-end">
+                        <!-- Sector / Depósito -->
+                        <div class="col-sm-6 col-md-2 mb-3">
+                            <label class="control-label font-weight-semibold text-2">
+                                <i class="fa fa-industry text-success mr-1"></i> DEPOSITO
+                            </label>
+                            <select id="select-sector" class="form-control selectpicker" data-live-search="true" title="Seleccione...">
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+ 
+                        <!-- Estaciones -->
+                        <div class="col-sm-6 col-md-2 mb-3">
+                            <label class="control-label font-weight-semibold text-2">
+                                <i class="fa fa-map-marker text-success mr-1"></i> ESTACIONES
+                            </label>
+                            <select id="select-estacion" class="form-control selectpicker" data-live-search="true" title="Seleccione..." disabled>
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+ 
+                        <!-- Mes -->
+                        <div class="col-sm-6 col-md-1 mb-3">
+                            <label class="control-label font-weight-semibold text-2">
+                                <i class="fa fa-calendar text-success mr-1"></i> MES
+                            </label>
+                            <select id="select-mes" class="form-control selectpicker" title="Mes">
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+ 
+                        <!-- Año -->
+                        <div class="col-sm-6 col-md-1 mb-3">
+                            <label class="control-label font-weight-semibold text-2">
+                                <i class="fa fa-calendar-alt text-success mr-1"></i> AÑO
+                            </label>
+                            <select id="select-year" class="form-control selectpicker" title="Año">
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+ 
+                        <!-- Indicador -->
+                        <div class="col-sm-6 col-md-2 mb-3">
+                            <label class="control-label font-weight-semibold text-2">
+                                <i class="fa fa-check-circle text-success mr-1"></i> INDICADOR
+                            </label>
+                            <select id="select-programa" class="form-control selectpicker" data-live-search="true" title="Programas">
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="col-sm-12 col-md-4 mb-2 text-right">
+                            <div class="btn-group">
+                                <button type="button" id="btn-filter" class="btn btn-default btn-sm border">
+                                    Filtrar <i class="fa fa-filter text-success ml-1"></i>
+                                </button>
+                                <button type="button" id="btn-delete" class="btn btn-default btn-sm border">
+                                    Eliminar <i class="fa fa-trash text-danger ml-1"></i>
+                                </button>
+                                <button type="button" id="btn-load" class="btn btn-success btn-sm ml-2">
+                                    Cargar <i class="fa fa-cloud-upload ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div> -->
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    <div class="panel-actions">
+                        <a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+                    </div>
+                    <h2 class="panel-title">Módulo de Carga de Datos</h2>
+                </header>
+                <div class="panel-body p-0">
+                    <div id="carga-datos-table"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    
+@push('css')
+    <!-- Bootstrap Selectpicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
+
+    <!-- Tabulator CSS -->
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap3.min.css" rel="stylesheet">
+    
+    <style>
+        .bootstrap-select .btn {
+            background-color: #fff !important;
+            border: 1px solid #E5E7E9 !important;
+            font-size: 12px !important;
+        }
+        
+        .control-label.text-2 {
+            font-size: 11px !important;
+            color: #777;
+        }
+
+        #carga-datos-table {
+            border: 1px solid #E5E7E9;
+            font-family: inherit;
+        }
+
+        /* Estilo para el encabezado */
+        .tabulator-header {
+            background-color: #f0f2f5 !important;
+            color: #333 !important;
+            border-bottom: 2px solid #dde1e5 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Corregir el solapamiento al deslizar (Importante para columnas 'frozen') */
+        .tabulator-col, .tabulator-col-content {
+            background-color: #f0f2f5 !important; /* Mismo color que el header pero opaco */
+            border-right: 1px solid #dde1e5 !important;
+        }
+
+        .tabulator-col-title {
+            padding: 6px 8px !important; /* Reducir padding vertical */
+            font-size: 13px !important;
+            text-transform: none !important; /* No mayúsculas */
+        }
+
+        /* Zebra striping para las filas */
+        .tabulator-row-odd {
+            background-color: #ffffff !important;
+        }
+        .tabulator-row-even {
+            background-color: #f9fbfe !important;
+        }
+
+        .tabulator-row:hover {
+            background-color: #f1f4f9 !important;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Ajustes para el placeholder */
+        .tabulator-placeholder-contents {
+            color: #999;
+            font-style: italic;
+            padding: 30px !important;
+            background-color: #fff;
+        }
+
+        /* Personalización de los filtros en el header */
+        .tabulator-header-filter {
+            padding: 3px 6px 6px 6px !important; /* Reducir padding superior */
+            background-color: #f0f2f5 !important;
+        }
+
+        .tabulator-header-filter input {
+            border: 1px solid #cbd2d9 !important;
+            border-radius: 4px !important;
+            padding: 4px 6px !important; /* Reducir padding interno del input */
+            font-size: 12px !important;
+            background: #ffffff !important;
+            color: #333 !important;
+            width: 100%;
+        }
+
+        .tabulator-header-filter input:focus {
+            border-color: #3498db !important;
+            box-shadow: 0 0 3px rgba(52, 152, 219, 0.3);
+            outline: none;
+        }
+    </style>
+@endpush
+
+@push('js')
+    <!-- Tabulator JS -->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+
+    <!-- Bootstrap Selectpicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // ── 1. TABULATOR (columnas dinámicas) ───────────────────────────
+            let table;
+            $.get('{{ url("/api/carga-datos/columns") }}', function (columns) {
+                table = new Tabulator("#carga-datos-table", {
+                    layout: "fitColumns",
+                    placeholder: "Sin datos disponibles",
+                    columns: columns,
+                    height: "500px",
+                });
+            });
+
+            // ── 2. CARGA DE FILTROS (un solo request) ────────────────────────
+            let allEstaciones = []; // guardamos todas para filtrar por depósito
+
+            $.get('{{ url("/api/carga-datos/filters") }}', function (data) {
+
+                // Depósitos → #select-sector
+                $.each(data.depositos, function (i, d) {
+                    $('#select-sector').append(
+                        $('<option>', { value: d.id_depositos, text: d.descripcion })
+                    );
+                });
+
+                // Estaciones (todas, en memoria para cascada)
+                allEstaciones = data.estaciones;
+
+                // Años → #select-year
+                $.each(data.years, function (i, y) {
+                    $('#select-year').append(
+                        $('<option>', { value: y, text: y })
+                    );
+                });
+
+                // Meses → #select-mes
+                $.each(data.meses, function (i, m) {
+                    $('#select-mes').append(
+                        $('<option>', { value: m.id, text: m.nombre })
+                    );
+                });
+
+                // Programas → #select-programa
+                $.each(data.programas, function (i, p) {
+                    $('#select-programa').append(
+                        $('<option>', { value: p.id_programa, text: p.nombre_serie })
+                    );
+                });
+
+                // Refrescar todos los selectpickers
+                $('.selectpicker').selectpicker('refresh');
+
+            }).fail(function (xhr) {
+                console.error('Error cargando filtros:', xhr.responseText);
+            });
+
+            // ── 3. CASCADA: Depósito → Estaciones ───────────────────────────
+            $('#select-sector').on('change', function () {
+                const depositoId = parseInt($(this).val());
+
+                $('#select-estacion').empty().prop('disabled', true);
+
+                if (depositoId) {
+                    // Filtrar las estaciones por clasificacion == id_depositos
+                    const filtradas = allEstaciones.filter(function (e) {
+                        return parseInt(e.clasificacion) === depositoId;
+                    });
+
+                    $.each(filtradas, function (i, e) {
+                        $('#select-estacion').append(
+                            $('<option>', { value: e.id_estacion, text: e.nombre_estacion })
+                        );
+                    });
+
+                    if (filtradas.length > 0) {
+                        $('#select-estacion').prop('disabled', false);
+                    }
+                }
+
+                $('#select-estacion').selectpicker('refresh');
+            });
+
+            // ── 4. BOTONES (placeholder) ─────────────────────────────────────
+            $('#btn-filter').on('click', function () {
+                alert('Función de Filtrar próximamente');
+            });
+            $('#btn-delete').on('click', function () {
+                alert('Función de Eliminar próximamente');
+            });
+            $('#btn-load').on('click', function () {
+                alert('Función de Cargar próximamente');
+            });
+
+        });
+    </script>
+@endpush
+
