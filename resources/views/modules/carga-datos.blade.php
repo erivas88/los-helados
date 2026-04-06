@@ -26,7 +26,7 @@
                         <!-- Estaciones -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-map-marker text-success"></i> ESTACIONES</label>
-                            <select id="select-estacion" class="form-control selectpicker" data-live-search="true" data-width="100%" disabled>
+                            <select multiple id="filtro-estaciones" class="form-control selectpicker" data-live-search="true" data-width="100%" disabled>
                                 <!-- Dynamic -->
                             </select>
                         </div>
@@ -34,7 +34,7 @@
                         <!-- Mes -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-calendar text-success"></i> MES</label>
-                            <select id="select-mes" class="form-control selectpicker" data-width="100%">
+                            <select multiple id="filtro-meses" class="form-control selectpicker" data-width="100%">
                                 <!-- Dynamic -->
                             </select>
                         </div>
@@ -42,7 +42,7 @@
                         <!-- Año -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-calendar-alt text-success"></i> AÑO</label>
-                            <select id="select-year" class="form-control selectpicker" data-width="100%">
+                            <select multiple id="filtro-anios" class="form-control selectpicker" data-width="100%">
                                 <!-- Dynamic -->
                             </select>
                         </div>
@@ -50,7 +50,7 @@
                         <!-- Indicador -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-check-circle text-success"></i> INDICADOR</label>
-                            <select id="select-programa" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                            <select id="filtro-indicador" class="form-control selectpicker" data-live-search="true" data-width="100%">
                                 <!-- Dynamic -->
                             </select>
                         </div>
@@ -58,7 +58,7 @@
                         <!-- Buttons as equal items -->
                         <div class="filter-item">
                             <label class="filter-label">&nbsp;</label>
-                            <button type="button" id="btn-filter" class="btn btn-default filter-btn btn-block">
+                            <button type="button" id="btn-filtrar" class="btn btn-default filter-btn btn-block">
                                 <i class="fa fa-filter text-success mr-1"></i> &nbsp; Filtrar
                             </button>
                         </div>
@@ -81,7 +81,7 @@
                 </div>
 
                 <!-- Table Section -->
-                <div id="carga-datos-table"></div>
+                <div id="tabla-muestras"></div>
             </div>
         </section>
     </div>
@@ -126,21 +126,14 @@
                     
                     <hr>
                     
-                    <h5 class="mt-3">Detalle de Registros Rechazados</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm" id="tabla-rechazos">
-                            <thead>
-                                <tr>
-                                    <th>Certificado</th>
-                                    <th>Fecha</th>
-                                    <th>Estación</th>
-                                    <th>Motivo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dynamic -->
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div id="grafico-carga" style="height: 350px;"></div>
+                        </div>
+                        <div class="col-md-7">
+                            <h5 class="mt-0">Detalle de Registros Rechazados</h5>
+                            <div id="tabla-rechazos" style="font-family: inherit;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -216,7 +209,7 @@
         font-size: 14px;
     }
 
-    #carga-datos-table {
+    #tabla-muestras {
         border: 1px solid #E5E7E9;
         margin-top: 15px;
         font-family: inherit;
@@ -232,6 +225,10 @@
    .tabulator-col, .tabulator-col-content {
    background-color: #f0f2f5 !important; /* Mismo color que el header pero opaco */
    border-right: 1px solid #dde1e5 !important;
+   }
+   /* Añadir la grilla vertical en todas las celdas */
+   .tabulator-cell {
+       border-right: 1px solid #dde1e5 !important;
    }
    .tabulator-col-title {
    padding: 6px 8px !important; /* Reducir padding vertical */
@@ -282,17 +279,32 @@
 <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
 <!-- Bootstrap Selectpicker JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Highcharts JS -->
+<script src="https://cdn.jsdelivr.net/npm/highcharts@11/highcharts.js"></script>
 <script>
    $(document).ready(function () {
    
        // ── 1. TABULATOR (columnas dinámicas) ───────────────────────────
        let table;
        $.get('{{ url("/api/carga-datos/columns") }}', function (columns) {
-           table = new Tabulator("#carga-datos-table", {
+           // Agregar columna de selección (Checkbox) al inicio
+           columns.unshift({
+               formatter:"rowSelection", 
+               titleFormatter:"rowSelection", 
+               hozAlign:"center", 
+               headerSort:false, 
+               frozen:true, 
+               width:40
+           });
+
+           table = new Tabulator("#tabla-muestras", {
                layout: "fitColumns",
                placeholder: "Sin datos disponibles",
                columns: columns,
                height: "500px",
+               selectableRows: true, // Habilitar selección de filas
            });
        });
    
@@ -311,23 +323,23 @@
            // Estaciones (todas, en memoria para cascada)
            allEstaciones = data.estaciones;
    
-           // Años → #select-year
+           // Años → #filtro-anios
            $.each(data.years, function (i, y) {
-               $('#select-year').append(
+               $('#filtro-anios').append(
                    $('<option>', { value: y, text: y })
                );
            });
    
-           // Meses → #select-mes
+           // Meses → #filtro-meses
            $.each(data.meses, function (i, m) {
-               $('#select-mes').append(
+               $('#filtro-meses').append(
                    $('<option>', { value: m.id, text: m.nombre })
                );
            });
    
-           // Programas → #select-programa
+           // Programas → #filtro-indicador
            $.each(data.programas, function (i, p) {
-               $('#select-programa').append(
+               $('#filtro-indicador').append(
                    $('<option>', { value: p.id_programa, text: p.nombre_serie })
                );
            });
@@ -343,7 +355,7 @@
        $('#select-sector').on('change', function () {
            const depositoId = parseInt($(this).val());
    
-           $('#select-estacion').empty().prop('disabled', true);
+           $('#filtro-estaciones').empty().prop('disabled', true);
    
            if (depositoId) {
                // Filtrar las estaciones por clasificacion == id_depositos
@@ -352,25 +364,135 @@
                });
    
                $.each(filtradas, function (i, e) {
-                   $('#select-estacion').append(
+                   $('#filtro-estaciones').append(
                        $('<option>', { value: e.id_estacion, text: e.nombre_estacion })
                    );
                });
    
                if (filtradas.length > 0) {
-                   $('#select-estacion').prop('disabled', false);
+                   $('#filtro-estaciones').prop('disabled', false);
                }
            }
    
-           $('#select-estacion').selectpicker('refresh');
+           $('#filtro-estaciones').selectpicker('refresh');
        });
    
-       // ── 4. BOTONES (placeholder) ─────────────────────────────────────
-       $('#btn-filter').on('click', function () {
-           alert('Función de Filtrar próximamente');
+       // ── 4. BOTONES ─────────────────────────────────────
+       $('#btn-filtrar').on('click', function () {
+           let stations = $('#filtro-estaciones').val() || [];
+           let months = $('#filtro-meses').val() || [];
+           let years = $('#filtro-anios').val() || [];
+
+           if (stations.length === 0 || months.length === 0 || years.length === 0) {
+               Swal.fire({
+                   icon: 'warning',
+                   title: 'Faltan parámetros',
+                   text: 'Por favor seleccione al menos una estación, un mes y un año.',
+                   confirmButtonColor: '#28a745'
+               });
+               return;
+           }
+           
+           let indicadorVal = $('#filtro-indicador').val() || "1";
+           let indicador = Array.isArray(indicadorVal) ? indicadorVal : [indicadorVal];
+
+           let params = {
+               stations: stations,
+               months: months,
+               years: years,
+               indicador: indicador
+           };
+
+           // Petición fetch nativa para mejor manejo de errores (ignorar el "Error" genérico de Tabulator)
+           let btn = $(this);
+           btn.prop('disabled', true);
+           
+           fetch("{{ url('/api/carga-datos/filtrar') }}", {
+               method: "POST",
+               headers: {
+                   "Content-Type": "application/json",
+                   "Accept": "application/json",
+                   "X-CSRF-TOKEN": "{{ csrf_token() }}"
+               },
+               body: JSON.stringify(params)
+           })
+           .then(response => {
+               if (!response.ok) {
+                   // Si hay un error HTTP (ej: 500, 419, 422)
+                   return response.text().then(text => {
+                       let msg = text;
+                       try { let j = JSON.parse(text); msg = j.message || j.error || text; } catch(e) {}
+                       throw new Error(msg);
+                   });
+               }
+               return response.json();
+           })
+           .then(data => {
+               if (data.error) throw new Error(data.error);
+               table.setData(data);
+               btn.prop('disabled', false);
+           })
+           .catch(error => {
+               console.error("Error backend:", error);
+               alert("Error al cargar datos: " + error.message);
+               btn.prop('disabled', false);
+           });
        });
+
        $('#btn-delete').on('click', function () {
-           alert('Función de Eliminar próximamente');
+           if (!table) return;
+           let selectedRows = table.getSelectedData();
+           
+           if (selectedRows.length === 0) {
+               Swal.fire({
+                   icon: 'info',
+                   title: 'Ninguna muestra seleccionada',
+                   text: 'Debes seleccionar al menos una muestra de la tabla para eliminar.',
+                   confirmButtonColor: '#17a2b8'
+               });
+               return;
+           }
+
+           let certificados = selectedRows.map(row => row.certificado);
+
+           Swal.fire({
+               title: '¿Estás seguro?',
+               text: "Se eliminarán " + selectedRows.length + " muestras seleccionadas. Esta acción no se puede deshacer.",
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#d33',
+               cancelButtonColor: '#3085d6',
+               confirmButtonText: 'Sí, eliminar',
+               cancelButtonText: 'Cancelar'
+           }).then((result) => {
+               if (result.isConfirmed) {
+                   Swal.fire({
+                       title: 'Eliminando...',
+                       allowOutsideClick: false,
+                       didOpen: () => { Swal.showLoading(); }
+                   });
+
+                   fetch("{{ url('/api/carga-datos/eliminar') }}", {
+                       method: 'POST',
+                       headers: {
+                           "Content-Type": "application/json",
+                           "Accept": "application/json",
+                           "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                       },
+                       body: JSON.stringify({ certificados: certificados })
+                   })
+                   .then(response => response.json().then(j => ({status: response.status, ok: response.ok, body: j})))
+                   .then(res => {
+                       if (!res.ok) throw new Error(res.body.message || res.body.error || 'Error al eliminar');
+                       Swal.fire('Eliminado!', 'Las muestras han sido eliminadas correctamente.', 'success');
+                       // Recargar la tabla usando el botón de filtro
+                       $('#btn-filtrar').click(); 
+                   })
+                   .catch(error => {
+                       Swal.fire('Error', error.message, 'error');
+                   });
+               }
+           });
        });
 
        // ── 5. IMPORTACION EXCEL ─────────────────────────────────────────
@@ -405,26 +527,58 @@
                     $('#res-ingresados').text(response.ingresados);
                     $('#res-rechazados').text(response.rechazados);
 
-                    // Llenar tabla
-                    if (response.tabla && response.tabla.length > 0) {
-                        var tbody = '';
-                        $.each(response.tabla, function(i, row) {
-                            if(row.motivo !== 'Ingresado') {
-                                tbody += '<tr>' +
-                                    '<td>' + row.certificado + '</td>' +
-                                    '<td>' + row.fecha + '</td>' +
-                                    '<td>' + row.estacion + '</td>' +
-                                    '<td><span class="text-danger">' + row.motivo + '</span></td>' +
-                                '</tr>';
+                    // Interfaz Tabulator en lugar de tabla manual HTML
+                    let dataMuestras = response.tabla || [];
+                    new Tabulator("#tabla-rechazos", {
+                        data: dataMuestras.filter(r => r.motivo !== 'Ingresado'), // Mostramos los rechazados
+                        layout: "fitColumns",
+                        height: "350px",
+                        placeholder: "Todos los registros fueron ingresados correctamente.",
+                        columns: [
+                            {title: "Certificado", field: "certificado", width: 120},
+                            {title: "Fecha", field: "fecha", width: 100},
+                            {title: "Estación", field: "estacion"},
+                            {title: "Motivo", field: "motivo", formatter: function(cell) {
+                                let val = cell.getValue();
+                                return val === 'Ingresado' ? `<span class="text-success">${val}</span>` : `<span class="text-danger">${val}</span>`;
+                            }}
+                        ]
+                    });
+
+                    // Gráfico de Donut con Highcharts
+                    Highcharts.chart('grafico-carga', {
+                        chart: { type: 'pie' },
+                        title: { text: null },
+                        subtitle: {
+                            text: '<span style="font-size: 14px; color: #666">Total</span><br><span style="font-size: 24px; color: #333; font-weight: bold">' + response.procesados + '</span>',
+                            align: 'center',
+                            verticalAlign: 'middle',
+                            y: 10
+                        },
+                        tooltip: { pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)' },
+                        plotOptions: {
+                            pie: {
+                                innerSize: '65%',
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: { 
+                                    enabled: true, 
+                                    format: '<b>{point.name}</b><br>{point.percentage:.1f} %',
+                                    distance: 15
+                                },
+                                showInLegend: false
                             }
-                        });
-                        if(tbody === '') {
-                             tbody = '<tr><td colspan="4" class="text-center text-success">Todos los registros fueron ingresados correctamente.</td></tr>';
-                        }
-                        $('#tabla-rechazos tbody').html(tbody);
-                    } else {
-                        $('#tabla-rechazos tbody').html('<tr><td colspan="4" class="text-center">No hubo rechazos.</td></tr>');
-                    }
+                        },
+                        series: [{
+                            name: 'Registros',
+                            colorByPoint: true,
+                            data: [
+                                { name: 'Ingresados', y: parseInt(response.ingresados), color: '#28a745' },
+                                { name: 'Rechazados', y: parseInt(response.rechazados), color: '#dc3545' }
+                            ]
+                        }],
+                        credits: { enabled: false }
+                    });
 
                     // Ocultar form y mostrar resultado
                     $('#formCargarExcel').hide();
@@ -448,7 +602,8 @@
            $('#btnProcesarExcel').show();
            $('#resultado-carga').hide();
            $('#formCargarExcel')[0].reset();
-           $('#tabla-rechazos tbody').empty();
+           $('#tabla-rechazos').empty();
+           $('#grafico-carga').empty();
        });
    
    });

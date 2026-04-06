@@ -217,4 +217,121 @@ class CargaDatosController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Filter data for Tabulator
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function filtrarMuestras(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'stations' => 'required|array',
+                'months' => 'required|array',
+                'years' => 'required|array',
+                'indicador' => 'required|array',
+            ]);
+
+            $stations = $data['stations'];
+            $months = $data['months'];
+            $years = $data['years'];
+            $indicador = $data['indicador'];
+
+            $stationNames = DB::table('estaciones')
+                ->whereIn('id_estacion', $stations)
+                ->pluck('nombre_estacion')
+                ->toArray();
+
+            if (empty($stationNames) || empty($months) || empty($years)) {
+                return response()->json([]);
+            }
+
+            $query = DB::table('muestras')
+                ->where('estatus', '0')
+                ->whereIn('estacion', $stationNames);
+
+            $query->where(function ($q) use ($years, $months) {
+                foreach ($years as $year) {
+                    foreach ($months as $month) {
+                        $q->orWhere(function ($subq) use ($year, $month) {
+                            $subq->whereYear('fecha', $year)
+                                 ->whereMonth('fecha', $month);
+                        });
+                    }
+                }
+            });
+
+            if (!empty($indicador)) {
+                $columnasPrograma = DB::table('programas')
+                    ->whereIn('id_programa', $indicador)
+                    ->pluck('columna_programa');
+
+                foreach ($columnasPrograma as $columna) {
+                    if (!empty($columna)) {
+                        $query->where($columna, '1');
+                    }
+                }
+            }
+
+            $selects = [
+                'id_certificado as certificado',
+                DB::raw("DATE_FORMAT(DATE_ADD(fecha, INTERVAL 1 DAY), '%Y-%m-%d') AS fecha"),
+                'estacion',
+                'estatus'
+            ];
+            for ($i = 1; $i <= 75; $i++) {
+                $selects[] = "parametro_$i";
+            }
+
+            $query->select($selects);
+            $query->orderBy('estacion')->orderBy('fecha')->orderBy('id_certificado');
+
+            $resultados = $query->get()->map(function ($row, $key) {
+                // Add id mapped to row index for unique datatable IDs if needed
+                $row->id = $key + 1;
+                
+                if ($row->estatus === '1') {
+                    $row->estatus = '<i class="fa fa-check" aria-hidden="true" style="color: #47a447"></i>';
+                }
+
+                foreach ($row as $k => $v) {
+                    if ($v === null || $v === '') {
+                        $row->$k = '―';
+                    }
+                }
+
+                return $row;
+            });
+
+            return response()->json($resultados);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete selected records from Tabulator.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function eliminarMuestras(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'certificados' => 'required|array|min:1',
+            ]);
+
+            DB::table('muestras')
+                ->whereIn('id_certificado', $data['certificados'])
+                ->delete();
+
+            return response()->json(['message' => 'Muestras eliminadas correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

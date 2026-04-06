@@ -36,5 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/carga-datos/columns', [CargaDatosController::class, 'getColumns']);
     Route::get('/api/carga-datos/filters', [CargaDatosController::class, 'getFilterData']);
     Route::get('/api/carga-datos/estaciones/{id_sector}', [CargaDatosController::class, 'getEstacionesBySector']);
+    Route::post('/api/carga-datos/filtrar', [CargaDatosController::class, 'filtrarMuestras']);
+    Route::post('/api/carga-datos/eliminar', [CargaDatosController::class, 'eliminarMuestras']);
     Route::post('/muestras/importar', [CargaDatosController::class, 'importar']);
 });
