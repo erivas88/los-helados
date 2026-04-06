@@ -14,7 +14,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 		<!-- Web Fonts  -->
-		<link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+		
+		<style>
+			body { font-family: 'Inter', sans-serif !important; }
+			h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif !important; }
+		</style>
 
 		<!-- Vendor CSS -->
 		<link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap/css/bootstrap.css') }}" />
@@ -264,6 +270,12 @@
 										<a href="{{ url('/graficos') }}">
 											<i class="fa fa-bar-chart-o" aria-hidden="true"></i>
 											<span>Gráficos</span>
+										</a>
+									</li>
+									<li class="{{ Request::is('estaciones-proyecto') ? 'nav-active' : '' }}">
+										<a href="{{ url('/estaciones-proyecto') }}">
+											<i class="fa fa-map-marker" aria-hidden="true"></i>
+											<span>Estaciones Proyecto</span>
 										</a>
 									</li>
 								</ul>

@@ -26,25 +26,57 @@
                         <!-- Estaciones -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-map-marker text-success"></i> ESTACIONES</label>
-                            <select multiple id="filtro-estaciones" class="form-control selectpicker" data-live-search="true" data-width="100%" disabled>
-                                <!-- Dynamic -->
-                            </select>
+                            <select 
+                                multiple 
+                                id="filtro-estaciones" 
+                                class="form-control selectpicker"  
+                                title="Estaciones"  
+                                data-size="5" 
+                                data-live-search="true" 
+                                data-width="100%"
+                                data-dropup-auto="false"
+                                data-selected-text-format="count" 
+                                data-count-selected-text=" ({0}) Estaciones "                            
+                                data-actions-box="true" 
+                                data-select-all-text="Todos"
+                                data-deselect-all-text="Ninguno">
+                     </select>
                         </div>
 
                         <!-- Mes -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-calendar text-success"></i> MES</label>
-                            <select multiple id="filtro-meses" class="form-control selectpicker" data-width="100%">
-                                <!-- Dynamic -->
-                            </select>
+                            <select 
+                        multiple 
+                        id="filtro-meses" 
+                        class="form-control selectpicker" 
+                        title="Seleccionar Meses"
+                        data-size="5" 
+                        data-width="100%"
+                        data-actions-box="true"
+                        data-select-all-text="Todos"
+                        data-deselect-all-text="Ninguno"
+                        data-selected-text-format="count > 1"
+                        data-count-selected-text="({0}) Meses">
+                     </select>
                         </div>
 
                         <!-- Año -->
                         <div class="filter-item">
                             <label class="filter-label"><i class="fa fa-calendar-alt text-success"></i> AÑO</label>
-                            <select multiple id="filtro-anios" class="form-control selectpicker" data-width="100%">
-                                <!-- Dynamic -->
-                            </select>
+                           <select 
+                        multiple 
+                        id="filtro-anios" 
+                        class="form-control selectpicker" 
+                        title="Años"
+                        data-size="5" 
+                        data-width="100%"
+                        data-actions-box="true"
+                        data-select-all-text="Todos"
+                        data-deselect-all-text="Ninguno"
+                        data-selected-text-format="count > 1"
+                        data-count-selected-text="({0}) Años">
+                     </select>
                         </div>
 
                         <!-- Indicador -->
@@ -286,9 +318,41 @@
 <script>
    $(document).ready(function () {
    
+       // Formateador para parámetros (miles: . , decimal: , )
+       const paramFormatter = function(cell) {
+           let val = cell.getValue();
+           if (val !== null && val !== undefined && val !== '' && val !== '―') {
+               let prefix = '';
+               let cleanVal = String(val).trim();
+               if (cleanVal.startsWith('<') || cleanVal.startsWith('>')) {
+                   prefix = cleanVal.charAt(0);
+                   cleanVal = cleanVal.substring(1).trim();
+               }
+               
+               // Parse numerically, handle comma decimal from DB
+               let parsed = parseFloat(cleanVal.replace(',', '.'));
+               if (!isNaN(parsed)) {
+                   // Chilean format: dots for thousands, comma for decimals, always at least 1 decimal
+                   const formatter = new Intl.NumberFormat('es-CL', {
+                       minimumFractionDigits: 1,
+                       maximumFractionDigits: 4
+                   });
+                   val = prefix + formatter.format(parsed);
+               }
+           }
+           return val;
+       };
+
        // ── 1. TABULATOR (columnas dinámicas) ───────────────────────────
        let table;
        $.get('{{ url("/api/carga-datos/columns") }}', function (columns) {
+           // Aplicar formateador a columnas de parámetros
+           columns.forEach(col => {
+               if (col.field && col.field.startsWith('parametro_')) {
+                   col.formatter = paramFormatter;
+               }
+           });
+
            // Agregar columna de selección (Checkbox) al inicio
            columns.unshift({
                formatter:"rowSelection", 
@@ -305,6 +369,10 @@
                columns: columns,
                height: "500px",
                selectableRows: true, // Habilitar selección de filas
+               pagination: "local",
+               paginationSize: 20,
+               paginationSizeSelector: [10, 20, 50, 100],
+               paginationCounter: "rows",
            });
        });
    
@@ -319,9 +387,25 @@
                    $('<option>', { value: d.id_depositos, text: d.descripcion })
                );
            });
+           // Seleccionar "Los Helados" (id 1) por defecto
+           $('#select-sector').val(1);
    
-           // Estaciones (todas, en memoria para cascada)
+           // Estaciones (Agrupadas)
            allEstaciones = data.estaciones;
+           const heladosGroup = $('<optgroup>', { label: 'Los Helados' });
+           const otrosGroup = $('<optgroup>', { label: 'Otras Estaciones' });
+
+           $.each(allEstaciones, function (i, e) {
+               const opt = $('<option>', { value: e.id_estacion, text: e.nombre_estacion });
+               if (parseInt(e.clasificacion) === 1) {
+                   heladosGroup.append(opt);
+               } else {
+                   otrosGroup.append(opt);
+               }
+           });
+
+           $('#filtro-estaciones').empty().append(heladosGroup).append(otrosGroup);
+           $('#filtro-estaciones').prop('disabled', false);
    
            // Años → #filtro-anios
            $.each(data.years, function (i, y) {
@@ -351,30 +435,9 @@
            console.error('Error cargando filtros:', xhr.responseText);
        });
    
-       // ── 3. CASCADA: Depósito → Estaciones ───────────────────────────
+       // ── 3. CASCADA: Depósito → Estaciones (OBSOLETO) ─────────────────
        $('#select-sector').on('change', function () {
-           const depositoId = parseInt($(this).val());
-   
-           $('#filtro-estaciones').empty().prop('disabled', true);
-   
-           if (depositoId) {
-               // Filtrar las estaciones por clasificacion == id_depositos
-               const filtradas = allEstaciones.filter(function (e) {
-                   return parseInt(e.clasificacion) === depositoId;
-               });
-   
-               $.each(filtradas, function (i, e) {
-                   $('#filtro-estaciones').append(
-                       $('<option>', { value: e.id_estacion, text: e.nombre_estacion })
-                   );
-               });
-   
-               if (filtradas.length > 0) {
-                   $('#filtro-estaciones').prop('disabled', false);
-               }
-           }
-   
-           $('#filtro-estaciones').selectpicker('refresh');
+           // Las estaciones ya se muestran todas agrupadas al inicio
        });
    
        // ── 4. BOTONES ─────────────────────────────────────

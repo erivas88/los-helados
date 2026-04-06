@@ -77,18 +77,18 @@
                 <div class="widget-summary">
                     <div class="widget-summary-col widget-summary-col-icon">
                         <div class="summary-icon bg-quartenary">
-                            <i class="fa fa-bar-chart-o"></i>
+                            <i class="fa fa-map-marker"></i>
                         </div>
                     </div>
                     <div class="widget-summary-col">
                         <div class="summary">
-                            <h4 class="title">Gráficos</h4>
+                            <h4 class="title">Estaciones Proyecto</h4>
                             <div class="info">
-                                <strong class="amount">Reportes</strong>
+                                <strong class="amount">Mapa Interactivo</strong>
                             </div>
                         </div>
                         <div class="summary-footer">
-                            <a href="{{ url('/graficos') }}" class="text-muted text-uppercase">(ir a módulo)</a>
+                            <a href="{{ url('/estaciones-proyecto') }}" class="text-muted text-uppercase">(ir a módulo)</a>
                         </div>
                     </div>
                 </div>
