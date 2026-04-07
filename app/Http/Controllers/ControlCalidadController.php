@@ -539,9 +539,11 @@ class ControlCalidadController extends Controller
      * @param string $certificado
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getHistorial($certificado)
+    public function getHistorial(Request $request)
     {
         try {
+            $certificado = $request->query('certificado');
+            
             $historial = DB::table('historial_modificaciones')
                 ->where('certificado', $certificado)
                 ->orderBy('fecha', 'desc')

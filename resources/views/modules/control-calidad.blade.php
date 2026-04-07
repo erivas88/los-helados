@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Control de Calidad - Porto Admin')
 @section('page_title', 'Control de Calidad')
 @section('content')
@@ -721,54 +721,75 @@
                 pagination: "local",
                 paginationSize: 20,
                 paginationSizeSelector: [10, 20, 50, 100],
-                paginationCounter: "rows",
-                cellEdited: function(cell) {
-                    const data = cell.getData();
-                    const colDef = cell.getColumn().getDefinition();
-                    const newValue = cell.getValue();
-                    const oldValue = cell.getOldValue();
+                paginationCounter: "rows"
+            });
 
-                    if (newValue == oldValue) return;
+            table.on("cellEdited", function(cell) {
+                const data = cell.getData();
+                const colDef = cell.getColumn().getDefinition();
+                const newValue = cell.getValue();
+                const oldValue = cell.getOldValue();
 
-                    Swal.fire({
-                        title: 'Modificando valor...',
-                        text: `El valor de ${colDef.nombre_parametro} cambiará de ${oldValue} a ${newValue}.`,
-                        icon: 'info',
-                        showCancelButton: true,
-                        confirmButtonText: 'Confirmar',
-                        cancelButtonText: 'Revertir'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch("{{ url('/api/control-calidad/update-parametro') }}", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({
-                                    certificado: data.certificado,
-                                    id_parametro: colDef.id_parametro,
-                                    nombre_parametro: colDef.nombre_parametro,
-                                    valor_nuevo: newValue,
-                                    valor_anterior: oldValue
-                                })
-                            })
-                            .then(res => res.json())
-                            .then(res => {
-                                if (res.error) throw new Error(res.error);
-                                Swal.fire({ icon: 'success', text: res.message, timer: 1500, showConfirmButton: false });
-                                let updatedData = {}; updatedData["band_edit_" + colDef.id_parametro] = 1;
-                                cell.getRow().update(updatedData);
-                            })
-                            .catch(err => {
-                                Swal.fire('Error', err.message, 'error');
-                                cell.restoreOldValue();
-                            });
-                        } else {
-                            cell.restoreOldValue();
-                        }
-                    });
+                if (newValue == oldValue) return;
+
+                // Extract id_parametro from field name just in case colDef property is missing/stripped
+                const fieldName = cell.getField();
+                let extractedId = null;
+                if (fieldName && fieldName.includes('_')) {
+                    extractedId = parseInt(fieldName.split('_')[1]);
                 }
+                const finalIdParam = colDef.id_parametro || extractedId;
+                const finalNombre = colDef.nombre_parametro || (colDef.title ? colDef.title.replace(/<[^>]*>?/gm, '') : fieldName);
+
+                Swal.fire({
+                    title: 'Modificando valor...',
+                    text: `El valor de ${finalNombre} cambiará de ${oldValue} a ${newValue}.`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Revertir'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("{{ url('/api/control-calidad/update-parametro') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                certificado: data.certificado,
+                                id_parametro: finalIdParam,
+                                nombre_parametro: finalNombre,
+                                valor_nuevo: newValue,
+                                valor_anterior: oldValue
+                            })
+                        })
+                        .then(async res => {
+                            if (!res.ok) {
+                                let errorMsg = 'No se pudo actualizar el registro';
+                                try {
+                                    const err = await res.json();
+                                    errorMsg = err.error || err.message || errorMsg;
+                                } catch (e) {}
+                                throw new Error(errorMsg);
+                            }
+                            return res.json();
+                        })
+                        .then(res => {
+                            if (res.error) throw new Error(res.error);
+                            Swal.fire({ icon: 'success', text: res.message || 'Actualizado', timer: 1500, showConfirmButton: false });
+                            let updatedData = {}; updatedData["band_edit_" + finalIdParam] = 1;
+                            cell.getRow().update(updatedData);
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', err.message, 'error');
+                            cell.restoreOldValue();
+                        });
+                    } else {
+                        cell.restoreOldValue();
+                    }
+                });
             });
        });
     
@@ -863,33 +884,57 @@
            Swal.fire({ title: '¿Marcar como pendientes?', icon: 'warning', showCancelButton: true }).then((r) => { if (r.isConfirmed) actualizarEstatusMasivo(certs, 0); });
        });
 
-       function actualizarEstatusMasivo(certs, nuevoStatus) {
-           fetch('{{ url("/api/control-calidad/update-estatus") }}', {
-               method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-               body: JSON.stringify({ certificados: certs, nuevo_estatus: nuevoStatus })
-           }).then(() => { $('#btn-filtrar').click(); });
-       }
+        function actualizarEstatusMasivo(certs, nuevoStatus) {
+            fetch('{{ url("/api/control-calidad/update-estatus") }}', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ certificados: certs, nuevo_estatus: nuevoStatus })
+            }).then(() => { $('#btn-filtrar').click(); });
+        }
 
-       // ── 4.3 LOG DE MODIFICACIONES ──────────────────────────────────
-       let tableHistorial;
-       $('#btn-view-historial').on('click', function() {
-           let selectedData = table.getSelectedData();
-           if (selectedData.length !== 1) return Swal.fire({ icon: 'info', text: 'Seleccione exactamente una muestra.' });
-           $('#modalHistorial').modal('show');
-           if (tableHistorial) tableHistorial.destroy();
-           tableHistorial = new Tabulator("#tabla-historial", {
-               ajaxURL: '{{ url("/api/control-calidad/historial") }}/' + selectedData[0].certificado,
-               layout: "fitColumns",
-               placeholder: "Sin modificaciones",
-               columns: [
-                   { title: "Parámetro", field: "nombre_parametro", width: 150 },
-                   { title: "Anterior", field: "valor_anterior", hozAlign: "center" },
-                   { title: "Nuevo", field: "valor_nuevo", hozAlign: "center" },
-                   { title: "Usuario", field: "usuario", hozAlign: "center" },
-                   { title: "Fecha", field: "fecha", hozAlign: "center" }
-               ]
-           });
-       });
+        // ── 4.3 LOG DE MODIFICACIONES ──────────────────────────────────
+        let tableHistorial;
+        $('#btn-view-historial').on('click', function() {
+            let selectedData = table.getSelectedData();
+            if (selectedData.length !== 1) return Swal.fire({ icon: 'info', text: 'Seleccione exactamente una muestra.' });
+            
+            const certificadoRaw = selectedData[0].certificado;
+            
+            $('#modalHistorial').modal('show');
+            
+            $('#modalHistorial').one('shown.bs.modal', function() {
+                if (tableHistorial) tableHistorial.destroy();
+                
+                tableHistorial = new Tabulator("#tabla-historial", {
+                    layout: "fitColumns",
+                    placeholder: "Sin modificaciones para este certificado",
+                    columns: [
+                        { title: "Parámetro", field: "nombre_parametro", widthGrow: 2 },
+                        { title: "Anterior", field: "valor_anterior", hozAlign: "center", widthGrow: 1 },
+                        { title: "Nuevo", field: "valor_nuevo", hozAlign: "center", widthGrow: 1 },
+                        { title: "Usuario", field: "usuario", hozAlign: "center", widthGrow: 1 },
+                        { title: "Fecha", field: "fecha", hozAlign: "center", widthGrow: 1 }
+                    ],
+                    data: []
+                });
+
+                const url = '{{ url("/api/control-calidad/historial") }}?certificado=' + encodeURIComponent(certificadoRaw);
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => {
+                        if(Array.isArray(data)) {
+                            tableHistorial.setData(data).then(() => {
+                                // Force a redraw after data is loaded to ensure alignment
+                                setTimeout(() => { tableHistorial.redraw(); }, 100);
+                            });
+                        } else if(data.error) {
+                             Swal.fire('Error', data.error, 'error');
+                        }
+                    })
+                    .catch(e => {
+                        console.error("Fetch history failed:", e);
+                    });
+            });
+        });
 
        function abrirModalStatus(certificados) {
            $('#status-certificados').val(certificados.join(','));

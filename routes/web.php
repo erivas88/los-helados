@@ -5,6 +5,7 @@ use App\Http\Controllers\ControlCalidadController;
 use App\Http\Controllers\VisualizacionController;
 use App\Http\Controllers\EstacionesProyectoController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,9 +17,8 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    });
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/dashboard/summary', [DashboardController::class, 'getSummary']);
 
     Route::get('/carga-datos', function () {
         return view('modules.carga-datos');
@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/control-calidad/chart-data', [ControlCalidadController::class, 'getChartData']);
     Route::post('/api/control-calidad/update-estatus', [ControlCalidadController::class, 'updateEstatus']);
     Route::post('/api/control-calidad/update-parametro', [ControlCalidadController::class, 'updateParametro']);
-    Route::get('/api/control-calidad/historial/{certificado}', [ControlCalidadController::class, 'getHistorial']);
+    Route::get('/api/control-calidad/historial', [ControlCalidadController::class, 'getHistorial']);
 
     Route::get('/api/visualizacion/columns', [VisualizacionController::class, 'getColumns']);
     Route::get('/api/visualizacion/filters', [VisualizacionController::class, 'getFilterData']);
