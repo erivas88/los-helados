@@ -196,6 +196,7 @@
                 },
                 series: [{
                     name: 'Muestras',
+                    innerSize: '68%',
                     colorByPoint: true,
                     data: [
                         { name: 'Pendientes QC', y: data.stats.pending, color: '#f39c12' },

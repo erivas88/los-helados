@@ -65,7 +65,7 @@
 		<header class="header">
 			<div class="logo-container">
 				<a href="{{ url('/') }}" class="logo">
-					<img src="{{ asset('assets/images/logo.png') }}" height="35" alt="Porto Admin" />
+					<img src="{{ asset('png/gp-negro.png') }}" height="45" style="padding-bottom: 10px;" />
 				</a>
 				<div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html"
 					data-fire-event="sidebar-left-opened">

@@ -17,8 +17,13 @@
 
 	<style>
 		body {
-			background: linear-gradient(135deg, #1e4d2b 0%, #2d5a27 100%);
+			background-color: #f7f9fc;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(145, 63%, 92%, 1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(202, 63%, 92%, 1) 0, transparent 50%);
 			font-family: 'Inter', sans-serif !important;
+            height: 100vh;
+            margin: 0;
 		}
 
 		h1, h2, h3, h4, h5, h6, .title {
@@ -34,34 +39,14 @@
 		}
 
 		.panel-sign {
-			border-radius: 12px;
+			background: #ffffff;
+			border-radius: 24px;
 			overflow: hidden;
-			box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-			border: none;
-			max-width: 450px;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+			border: 1px solid rgba(226, 232, 240, 0.8);
+			max-width: 440px;
 			width: 100%;
-		}
-
-		.panel-sign .panel-title-sign {
-			background: #27ae60;
-			padding: 25px;
-			text-align: center;
-		}
-
-		.panel-sign .panel-title-sign .title {
-			color: #fff;
-			font-size: 20px;
-			font-weight: 700;
-			margin: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 10px;
-		}
-
-		.panel-sign .panel-body {
-			padding: 40px;
-			background: #fff;
+            padding: 45px;
 		}
 
 		.logo-container {
@@ -69,148 +54,167 @@
 			margin-bottom: 25px;
 		}
 
+		.title-accent {
+			text-align: center;
+			color: #1a202c;
+			font-size: 24px;
+			font-weight: 800;
+			margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+		}
+
 		.platform-sub {
 			text-align: center;
-			color: #666;
-			margin-bottom: 30px;
+			color: #718096;
+			margin-bottom: 35px;
 			font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
 		}
 
 		.form-group label {
-			font-weight: 600;
-			color: #2c3e50;
-			margin-bottom: 8px;
+			font-weight: 700;
+			color: #4a5568;
+			margin-bottom: 6px;
+            font-size: 13px;
 		}
 
 		.input-lg {
-			height: 50px;
-			border-radius: 8px;
-			border: 1px solid #e0e6ed;
+			height: 52px;
+			border-radius: 12px;
+			border: 1px solid #e2e8f0;
 			font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: none !important;
+            background: #fcfdfe;
 		}
 
 		.input-lg:focus {
 			border-color: #27ae60;
-			box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
-		}
-
-		.input-group-addon {
-			border-radius: 0 8px 8px 0;
-			background: #f8f9fa;
-			border-left: none;
-			color: #27ae60;
+			background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.05) !important;
 		}
 
 		.btn-primary {
-			background: #27ae60 !important;
+			background: #1a202c !important;
+			color: #fff !important;
 			border: none !important;
-			height: 50px;
+			height: 54px;
 			font-weight: 700;
 			font-size: 16px;
-			border-radius: 8px;
-			transition: all 0.3s ease;
+			border-radius: 12px;
+			transition: all 0.25s ease;
+            margin-top: 10px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 		}
 
 		.btn-primary:hover {
-			background: #219150 !important;
+			background: #2d3748 !important;
 			transform: translateY(-2px);
-			box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+			box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.15);
 		}
 
 		.checkbox-custom label {
 			padding-left: 10px;
-			color: #7f8c8d;
+			color: #718096;
+            font-size: 14px;
+            font-weight: 500;
 		}
 
 		.text-muted {
-			color: rgba(255, 255, 255, 0.6) !important;
+			color: #94a3b8 !important;
 		}
+
+        .forgot-link {
+            color: #27ae60 !important;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .forgot-link:hover {
+            color: #219150 !important;
+            text-decoration: underline;
+        }
 
 		.alert-danger {
-			border-radius: 8px;
+			border-radius: 12px;
 			margin-bottom: 25px;
+            border: none;
+            background: #fff5f5;
+            color: #c53030;
+            font-size: 14px;
+            padding: 15px;
 		}
 
-		.icon-leaf {
-			font-size: 24px;
-			color: #fff;
-		}
+        .footer-copyright {
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #94a3b8;
+        }
 	</style>
 </head>
 
 <body>
 	<section class="body-sign">
 		<div class="center-sign">
-			<div class="panel panel-sign">
-				<div class="panel-title-sign">
-					<h2 class="title"><i class="fa fa-leaf icon-leaf"></i> SISTEMA DE MONITOREO</h2>
+			<div class="panel-sign">
+				<div class="logo-container">
+					<img src="{{ asset('png/gp-fullcolor.png') }}" height="100" alt="Logo" />
 				</div>
-				<div class="panel-body">
-					<div class="logo-container">
-						<img src="{{ asset('assets/images/logo.png') }}" height="60" alt="Logo" />
+				
+                <h2 class="title-accent">Bienvenido de nuevo</h2>
+				<p class="platform-sub">Introduzca sus credenciales para acceder al sistema de monitoreo ambiental.</p>
+
+				@if ($errors->any())
+					<div class="alert alert-danger">
+						<ul class="list-unstyled mb-none">
+							@foreach ($errors->all() as $error)
+								<li><i class="fa fa-exclamation-circle mr-xs"></i> {{ $error }}</li>
+							@endforeach
+						</ul>
 					</div>
-					<p class="platform-sub">Plataforma de Seguimiento y Control Ambiental</p>
+				@endif
 
-					@if ($errors->any())
-						<div class="alert alert-danger">
-							<ul class="list-unstyled mb-none">
-								@foreach ($errors->all() as $error)
-									<li><i class="fa fa-exclamation-circle mr-xs"></i> {{ $error }}</li>
-								@endforeach
-							</ul>
+				<form action="{{ url('/login') }}" method="POST">
+					@csrf
+					<div class="form-group mb-lg">
+						<label>Correo Electrónico</label>
+						<input name="email" type="email" class="form-control input-lg"
+							value="{{ old('email') }}" placeholder="ejemplo@correo.com" required autofocus />
+					</div>
+
+					<div class="form-group mb-lg">
+						<div class="clearfix">
+							<label class="pull-left">Contraseña</label>
+							<a href="#" class="pull-right forgot-link">¿Olvidó su contraseña?</a>
 						</div>
-					@endif
+						<input name="password" type="password" class="form-control input-lg"
+							placeholder="Ingrese su contraseña" required />
+					</div>
 
-					<form action="{{ url('/login') }}" method="POST">
-						@csrf
-						<div class="form-group mb-lg">
-							<label>Correo Electrónico</label>
-							<div class="input-group input-group-icon">
-								<input name="email" type="email" class="form-control input-lg"
-									value="{{ old('email') }}" placeholder="ejemplo@correo.com" required autofocus />
-								<span class="input-group-addon">
-									<span class="icon icon-lg">
-										<i class="fa fa-envelope"></i>
-									</span>
-								</span>
-							</div>
-						</div>
-
-						<div class="form-group mb-lg">
-							<div class="clearfix">
-								<label class="pull-left">Contraseña</label>
-								<a href="#" class="pull-right text-success" style="font-size: 12px;">¿Olvidó su
-									contraseña?</a>
-							</div>
-							<div class="input-group input-group-icon">
-								<input name="password" type="password" class="form-control input-lg"
-									placeholder="Ingrese su contraseña" required />
-								<span class="input-group-addon">
-									<span class="icon icon-lg">
-										<i class="fa fa-lock"></i>
-									</span>
-								</span>
+					<div class="row" style="margin-top: 15px;">
+						<div class="col-sm-12">
+							<div class="checkbox-custom checkbox-default">
+								<input id="RememberMe" name="remember" type="checkbox" />
+								<label for="RememberMe">Mantener sesión iniciada</label>
 							</div>
 						</div>
+					</div>
 
-						<div class="row">
-							<div class="col-sm-7">
-								<div class="checkbox-custom checkbox-default">
-									<input id="RememberMe" name="remember" type="checkbox" />
-									<label for="RememberMe">Recordarme</label>
-								</div>
-							</div>
-							<div class="col-sm-5 text-right">
-								<button type="submit" class="btn btn-primary btn-block">Ingresar</button>
-							</div>
-						</div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-12">
+                            <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                        </div>
+                    </div>
 
-					</form>
-				</div>
+				</form>
+				
+                <div class="footer-copyright">
+                    &copy; {{ date('Y') }} GP CONSULTORES. Todos los derechos reservados.
+                </div>
 			</div>
-
-			<p class="text-center text-muted mt-md mb-md">&copy; {{ date('Y') }} Plataforma de Monitoreo Ambiental.
-				Todos los derechos reservados.</p>
 		</div>
 	</section>
 
