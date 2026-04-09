@@ -13,20 +13,28 @@
 	<link rel="stylesheet" href="{{ asset('assets/stylesheets/skins/default.css') }}" />
 
 	<!-- Web Fonts  -->
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+		rel="stylesheet">
 
 	<style>
 		body {
 			background-color: #f7f9fc;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(145, 63%, 92%, 1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(202, 63%, 92%, 1) 0, transparent 50%);
+			background-image:
+				radial-gradient(at 0% 0%, hsla(145, 63%, 92%, 1) 0, transparent 50%),
+				radial-gradient(at 50% 0%, hsla(202, 63%, 92%, 1) 0, transparent 50%);
 			font-family: 'Inter', sans-serif !important;
-            height: 100vh;
-            margin: 0;
+			height: 100vh;
+			margin: 0;
 		}
 
-		h1, h2, h3, h4, h5, h6, .title {
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		.title {
 			font-family: 'Outfit', sans-serif !important;
 		}
 
@@ -46,7 +54,7 @@
 			border: 1px solid rgba(226, 232, 240, 0.8);
 			max-width: 440px;
 			width: 100%;
-            padding: 45px;
+			padding: 45px;
 		}
 
 		.logo-container {
@@ -60,7 +68,7 @@
 			font-size: 24px;
 			font-weight: 800;
 			margin: 0 0 8px 0;
-            letter-spacing: -0.5px;
+			letter-spacing: -0.5px;
 		}
 
 		.platform-sub {
@@ -68,15 +76,15 @@
 			color: #718096;
 			margin-bottom: 35px;
 			font-size: 14px;
-            font-weight: 500;
-            line-height: 1.5;
+			font-weight: 500;
+			line-height: 1.5;
 		}
 
 		.form-group label {
 			font-weight: 700;
 			color: #4a5568;
 			margin-bottom: 6px;
-            font-size: 13px;
+			font-size: 13px;
 		}
 
 		.input-lg {
@@ -84,16 +92,16 @@
 			border-radius: 12px;
 			border: 1px solid #e2e8f0;
 			font-size: 15px;
-            font-weight: 500;
-            transition: all 0.2s;
-            box-shadow: none !important;
-            background: #fcfdfe;
+			font-weight: 500;
+			transition: all 0.2s;
+			box-shadow: none !important;
+			background: #fcfdfe;
 		}
 
 		.input-lg:focus {
 			border-color: #27ae60;
 			background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.05) !important;
+			box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.05) !important;
 		}
 
 		.btn-primary {
@@ -105,8 +113,8 @@
 			font-size: 16px;
 			border-radius: 12px;
 			transition: all 0.25s ease;
-            margin-top: 10px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+			margin-top: 10px;
+			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 		}
 
 		.btn-primary:hover {
@@ -118,41 +126,42 @@
 		.checkbox-custom label {
 			padding-left: 10px;
 			color: #718096;
-            font-size: 14px;
-            font-weight: 500;
+			font-size: 14px;
+			font-weight: 500;
 		}
 
 		.text-muted {
 			color: #94a3b8 !important;
 		}
 
-        .forgot-link {
-            color: #27ae60 !important;
-            font-weight: 600;
-            font-size: 13px;
-            text-decoration: none;
-        }
-        .forgot-link:hover {
-            color: #219150 !important;
-            text-decoration: underline;
-        }
+		.forgot-link {
+			color: #27ae60 !important;
+			font-weight: 600;
+			font-size: 13px;
+			text-decoration: none;
+		}
+
+		.forgot-link:hover {
+			color: #219150 !important;
+			text-decoration: underline;
+		}
 
 		.alert-danger {
 			border-radius: 12px;
 			margin-bottom: 25px;
-            border: none;
-            background: #fff5f5;
-            color: #c53030;
-            font-size: 14px;
-            padding: 15px;
+			border: none;
+			background: #fff5f5;
+			color: #c53030;
+			font-size: 14px;
+			padding: 15px;
 		}
 
-        .footer-copyright {
-            margin-top: 30px;
-            font-size: 12px;
-            text-align: center;
-            color: #94a3b8;
-        }
+		.footer-copyright {
+			margin-top: 30px;
+			font-size: 12px;
+			text-align: center;
+			color: #94a3b8;
+		}
 	</style>
 </head>
 
@@ -163,9 +172,9 @@
 				<div class="logo-container">
 					<img src="{{ asset('png/gp-fullcolor.png') }}" height="100" alt="Logo" />
 				</div>
-				
-                <h2 class="title-accent">Bienvenido de nuevo</h2>
-				<p class="platform-sub">Introduzca sus credenciales para acceder al sistema de monitoreo ambiental.</p>
+
+				<h2 class="title-accent">Bienvenido</h2>
+				<p class="platform-sub">Plataforma de seguimiento ambiental.</p>
 
 				@if ($errors->any())
 					<div class="alert alert-danger">
@@ -181,8 +190,8 @@
 					@csrf
 					<div class="form-group mb-lg">
 						<label>Correo Electrónico</label>
-						<input name="email" type="email" class="form-control input-lg"
-							value="{{ old('email') }}" placeholder="ejemplo@correo.com" required autofocus />
+						<input name="email" type="email" class="form-control input-lg" value="{{ old('email') }}"
+							placeholder="ejemplo@correo.com" required autofocus />
 					</div>
 
 					<div class="form-group mb-lg">
@@ -203,17 +212,17 @@
 						</div>
 					</div>
 
-                    <div class="row" style="margin-top: 20px;">
-                        <div class="col-sm-12">
-                            <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
-                        </div>
-                    </div>
+					<div class="row" style="margin-top: 20px;">
+						<div class="col-sm-12">
+							<button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+						</div>
+					</div>
 
 				</form>
-				
-                <div class="footer-copyright">
-                    &copy; {{ date('Y') }} GP CONSULTORES. Todos los derechos reservados.
-                </div>
+
+				<div class="footer-copyright">
+					&copy; {{ date('Y') }} GP CONSULTORES. Todos los derechos reservados.
+				</div>
 			</div>
 		</div>
 	</section>

@@ -256,12 +256,14 @@ class ControlCalidadController extends Controller
                 'months' => 'required|array',
                 'years' => 'required|array',
                 'indicador' => 'required|array',
+                'estatus' => 'nullable'
             ]);
 
             $stations = $data['stations'];
             $months = $data['months'];
             $years = $data['years'];
             $indicador = $data['indicador'];
+            $estatus = $data['estatus'] ?? null;
 
             $stationNames = DB::table('estaciones')
                 ->whereIn('id_estacion', $stations)
@@ -274,6 +276,10 @@ class ControlCalidadController extends Controller
 
             $query = DB::table('muestras')
                 ->whereIn('estacion', $stationNames);
+
+            if ($estatus !== null && $estatus !== '') {
+                $query->where('estatus', $estatus);
+            }
 
             $query->where(function ($q) use ($years, $months) {
                 foreach ($years as $year) {
@@ -370,11 +376,17 @@ class ControlCalidadController extends Controller
                 'stations' => 'required|array',
                 'parametros' => 'required|array',
                 'indicador' => 'nullable|array',
+                'estatus' => 'nullable',
+                'months' => 'nullable|array',
+                'years' => 'nullable|array'
             ]);
 
             $stations = $data['stations'];
             $parametros = $data['parametros'];
             $indicador = $data['indicador'] ?? [];
+            $estatus = $data['estatus'] ?? null;
+            $months = $data['months'] ?? [];
+            $years = $data['years'] ?? [];
 
             $stationNames = DB::table('estaciones')
                 ->whereIn('id_estacion', $stations)
@@ -387,6 +399,23 @@ class ControlCalidadController extends Controller
 
             $query = DB::table('muestras')
                 ->whereIn('estacion', $stationNames);
+
+            if ($estatus !== null && $estatus !== '') {
+                $query->where('estatus', $estatus);
+            }
+
+            if (!empty($years) && !empty($months)) {
+                $query->where(function ($q) use ($years, $months) {
+                    foreach ($years as $year) {
+                        foreach ($months as $month) {
+                            $q->orWhere(function ($subq) use ($year, $month) {
+                                $subq->whereYear('fecha', $year)
+                                     ->whereMonth('fecha', $month);
+                            });
+                        }
+                    }
+                });
+            }
 
             if (!empty($indicador)) {
                 $columnasPrograma = DB::table('programas')
@@ -401,6 +430,7 @@ class ControlCalidadController extends Controller
             }
 
             $selects = [
+                'id_certificado as certificado',
                 'estacion',
                 DB::raw("DATE_FORMAT(DATE_ADD(fecha, INTERVAL 1 DAY), '%Y-%m-%d') AS fecha_label"),
                 'fecha'

@@ -272,6 +272,16 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             font-family: 'Inter', sans-serif !important;
         }
+
+        /* Fix admin template global styles affecting map tiles */
+        .leaflet-tile {
+            border: none !important;
+            outline: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
     </style>
 @endpush
 
@@ -344,7 +354,25 @@
 
     <script>
         $(document).ready(function () {
-            Highcharts.setOptions({ lang: { thousandsSep: '.', decimalPoint: ',' } });
+            Highcharts.setOptions({ lang: {
+               months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+               weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+               shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+               thousandsSep: '.',
+               decimalPoint: ',',
+               downloadPNG: 'Descargar imagen PNG',
+               downloadJPEG: 'Descargar imagen JPEG',
+               downloadPDF: 'Descargar documento PDF',
+               downloadSVG: 'Descargar imagen SVG',
+               printChart: 'Imprimir gráfico',
+               viewFullscreen: 'Ver en pantalla completa',
+               exportButtonTitle: 'Exportar gráfico',
+               contextButtonTitle: 'Menú contextual',
+               resetZoom: 'Restablecer zoom',
+               resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+               loading: 'Cargando...',
+               noData: 'No hay datos para mostrar'
+            } });
 
             const utm19S = "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs";
             const wgs84 = "+proj=longlat +datum=WGS84 +no_defs";
