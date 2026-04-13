@@ -3,16 +3,36 @@
 @section('page_title', 'Carga de Datos')
 @section('content')
 @include('partials.modules')
+<!-- Intro Banner -->
+<div class="row" style="margin-bottom: 25px;">
+    <div class="col-md-12">
+        <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #0088cc; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                        <i class="fa fa-database" style="color: #0088cc;"></i> Explorador y Carga de Datos
+                    </h2>
+                    <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
+                        Consulte los registros analíticos existentes en la base de datos o consolide nueva información.
+                    </p>
+                </div>
+                <div>
+                    <button type="button" id="btn-load-top" class="btn btn-primary" data-toggle="modal" data-target="#modalCargar" style="padding: 12px 24px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 15px; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,136,204,0.3); transition: all 0.3s ease;">
+                        <i class="fa fa-cloud-upload mr-2"></i> Importar Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Main Row -->
 <div class="row">
     <div class="col-md-12">
-        <section class="panel">
-            <header class="panel-heading">
-                <h2 class="panel-title">Módulo de Carga de Datos</h2>
-            </header>
-            <div class="panel-body">
+        <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="panel-body" style="padding: 25px;">
                 <!-- Filter Toolbar -->
-                <div class="filter-toolbar" style="margin-bottom: 20px;">
+                <div class="filter-toolbar">
                     <div class="flex-toolbar-container">
                         
                         <!-- Depósito -->
@@ -87,25 +107,17 @@
                             </select>
                         </div>
 
-                        <!-- Buttons as equal items -->
                         <div class="filter-item">
                             <label class="filter-label">&nbsp;</label>
-                            <button type="button" id="btn-filtrar" class="btn btn-default filter-btn btn-block">
-                                <i class="fa fa-filter text-success mr-1"></i> &nbsp; Filtrar
+                            <button type="button" id="btn-filtrar" class="btn btn-primary filter-btn btn-block" style="background-color: #0088cc; border-color: #0088cc; font-family: 'Outfit', sans-serif; font-weight: 600;">
+                                <i class="fa fa-search mr-1"></i> &nbsp; Consultar
                             </button>
                         </div>
 
                         <div class="filter-item">
                             <label class="filter-label">&nbsp;</label>
-                            <button type="button" id="btn-delete" class="btn btn-default filter-btn btn-block">
-                                <i class="fa fa-trash text-danger mr-1"></i> &nbsp;  Eliminar
-                            </button>
-                        </div>
-
-                        <div class="filter-item">
-                            <label class="filter-label">&nbsp;</label>
-                            <button type="button" id="btn-load" class="btn btn-success filter-btn btn-block" data-toggle="modal" data-target="#modalCargar">
-                                <i class="fa fa-cloud mr-1"></i>&nbsp;  Cargar
+                            <button type="button" id="btn-delete" class="btn btn-danger filter-btn btn-block" style="font-family: 'Outfit', sans-serif; font-weight: 600;">
+                                <i class="fa fa-trash mr-1"></i> &nbsp; Eliminar
                             </button>
                         </div>
 
@@ -141,22 +153,28 @@
                 </form>
 
                 <div id="resultado-carga" style="display: none; margin-top: 20px;">
-                    <div class="row text-center mb-4">
+                    <div class="row mb-4">
                         <div class="col-md-4">
-                            <span class="badge badge-secondary" style="font-size: 14px;">PROCESADOS</span><br><br>
-                            <span style="font-size: 24px" id="res-procesados">0</span>
+                            <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <h6 style="color: #6c757d; font-family: 'Inter', sans-serif; font-weight: 600; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Procesados</h6>
+                                <span style="font-size: 32px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #495057;" id="res-procesados">0</span>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <span class="badge badge-success" style="font-size: 14px; background-color: #28a745;">INGRESADOS</span><br><br>
-                            <span style="font-size: 24px; color: #28a745;" id="res-ingresados">0</span>
+                            <div style="background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <h6 style="color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Ingresados</h6>
+                                <span style="font-size: 32px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #059669;" id="res-ingresados">0</span>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <span class="badge badge-danger" style="font-size: 14px; background-color: #dc3545;">RECHAZADOS</span><br><br>
-                            <span style="font-size: 24px; color: #dc3545;" id="res-rechazados">0</span>
+                            <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <h6 style="color: #ef4444; font-family: 'Inter', sans-serif; font-weight: 600; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Rechazados</h6>
+                                <span style="font-size: 32px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #dc2626;" id="res-rechazados">0</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <hr>
+                    <hr style="border-top: 1px dashed #e2e8f0; margin-bottom: 25px;">
                     
                     <div class="row">
                         <div class="col-md-5">
@@ -188,10 +206,12 @@
 <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap3.min.css" rel="stylesheet">
 <style>
     .filter-toolbar {
-        background: #f8f9fa;
-        padding: 10px 15px;
-        border-radius: 4px;
-        border: 1px solid #eee;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        margin-bottom: 25px;
     }
 
     /* Custom Flexbox Classes (Bootstrap 3 fallback) */
@@ -244,7 +264,9 @@
     #tabla-muestras {
         border: 1px solid #E5E7E9;
         margin-top: 15px;
-        font-family: inherit;
+        font-family: 'Inter', sans-serif;
+        border-radius: 8px;
+        overflow: hidden;
     }
    /* Estilo para el encabezado */
    .tabulator-header {

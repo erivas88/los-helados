@@ -6,6 +6,7 @@
 @section('content')
     @include('partials.modules')
 
+
     <!-- Dashboard Summary Cards -->
     <div class="row">
         <div class="col-md-6 col-lg-6 col-xl-3">
@@ -165,6 +166,7 @@
 <style>
     .amount { font-size: 28px !important; }
     .panel-featured-left .summary-icon { border-radius: 8px; width: 50px; height: 50px; line-height: 50px; font-size: 24px; }
+
 </style>
 @endpush
 

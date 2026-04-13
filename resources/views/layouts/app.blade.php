@@ -143,6 +143,12 @@
 					<div class="nano-content">
 						<nav id="menu" class="nav-main" role="navigation">
 							<ul class="nav nav-main">
+								<li class="{{ Request::is('inicio') || Request::is('/') ? 'nav-active' : '' }}">
+									<a href="{{ url('/inicio') }}">
+										<i class="fa fa-star" aria-hidden="true"></i>
+										<span>Inicio</span>
+									</a>
+								</li>
 								<li class="{{ Request::is('dashboard') ? 'nav-active' : '' }}">
 									<a href="{{ url('/dashboard') }}">
 										<i class="fa fa-home" aria-hidden="true"></i>

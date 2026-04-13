@@ -81,6 +81,12 @@ class ControlCalidadController extends Controller
                 ->orderBy('p.nombre_largo')
                 ->get();
 
+            // normas
+            $normas = DB::table('normas')
+                ->select('id_norma', 'nombre')
+                ->orderBy('nombre')
+                ->get();
+
             return response()->json([
                 'depositos'  => $depositos,
                 'estaciones' => $estaciones,
@@ -88,6 +94,7 @@ class ControlCalidadController extends Controller
                 'programas'  => $programas,
                 'meses'      => $meses,
                 'parametros' => $parametros,
+                'normas'     => $normas,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -378,7 +385,9 @@ class ControlCalidadController extends Controller
                 'indicador' => 'nullable|array',
                 'estatus' => 'nullable',
                 'months' => 'nullable|array',
-                'years' => 'nullable|array'
+                'years' => 'nullable|array',
+                'id_norma' => 'nullable|array',
+                'id_norma.*' => 'integer'
             ]);
 
             $stations = $data['stations'];
@@ -452,9 +461,39 @@ class ControlCalidadController extends Controller
                 ->get()
                 ->keyBy('id_parametro');
 
+            $normaResponse = null;
+            if (!empty($data['id_norma'])) {
+                $normasInfo = DB::table('normas')
+                    ->whereIn('id_norma', $data['id_norma'])
+                    ->pluck('nombre', 'id_norma');
+
+                $normaRanges = DB::table('normas_valores')
+                    ->whereIn('id_norma', $data['id_norma'])
+                    ->whereIn('id_parametro', $parametros)
+                    ->select('id_norma', 'id_parametro', 'valor_max', 'valor_min')
+                    ->get();
+
+                $ranges = [];
+                foreach ($normaRanges as $item) {
+                    $ranges[$item->id_parametro][] = [
+                        'id_norma' => $item->id_norma,
+                        'nombre' => $normasInfo[$item->id_norma] ?? null,
+                        'max' => $item->valor_max !== null ? (float) $item->valor_max : null,
+                        'min' => $item->valor_min !== null ? (float) $item->valor_min : null,
+                    ];
+                }
+
+                $normaResponse = [
+                    'ids' => $data['id_norma'],
+                    'nombres' => $normasInfo->toArray(),
+                    'ranges' => $ranges,
+                ];
+            }
+
             return response()->json([
                 'raw' => $resultados,
-                'parametros_info' => $paramNames
+                'parametros_info' => $paramNames,
+                'norma' => $normaResponse
             ]);
 
         } catch (\Exception $e) {

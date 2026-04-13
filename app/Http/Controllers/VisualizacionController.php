@@ -208,9 +208,40 @@ class VisualizacionController extends ControlCalidadController
                 ->get()
                 ->keyBy('id_parametro');
 
+            $normaResponse = null;
+            if ($request->has('id_norma') && !empty($request->input('id_norma'))) {
+                $id_normas = $request->input('id_norma');
+                $normasInfo = DB::table('normas')
+                    ->whereIn('id_norma', $id_normas)
+                    ->pluck('nombre', 'id_norma');
+
+                $normaRanges = DB::table('normas_valores')
+                    ->whereIn('id_norma', $id_normas)
+                    ->whereIn('id_parametro', $parametros)
+                    ->select('id_norma', 'id_parametro', 'valor_max', 'valor_min')
+                    ->get();
+
+                $ranges = [];
+                foreach ($normaRanges as $item) {
+                    $ranges[$item->id_parametro][] = [
+                        'id_norma' => $item->id_norma,
+                        'nombre' => $normasInfo[$item->id_norma] ?? null,
+                        'max' => $item->valor_max !== null ? (float) $item->valor_max : null,
+                        'min' => $item->valor_min !== null ? (float) $item->valor_min : null,
+                    ];
+                }
+
+                $normaResponse = [
+                    'ids' => $id_normas,
+                    'nombres' => $normasInfo->toArray(),
+                    'ranges' => $ranges,
+                ];
+            }
+
             return response()->json([
                 'raw' => $raw,
-                'parametros_info' => $parametrosInfo
+                'parametros_info' => $parametrosInfo,
+                'norma' => $normaResponse
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

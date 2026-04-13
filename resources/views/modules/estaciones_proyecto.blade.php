@@ -291,15 +291,30 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            <section class="panel panel-featured-left panel-featured-primary">
-                <header class="panel-heading">
-                    <div class="panel-actions">
-                        <a href="#" class="fa fa-caret-down"></a>
+            <!-- Intro Banner -->
+    <div class="row" style="margin-bottom: 25px;">
+        <div class="col-md-12">
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #0088cc; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                            <i class="fa fa-map-o" style="color: #0088cc;"></i> Visor Geográfico
+                        </h2>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
+                            Explore espacialmente las estaciones de monitoreo y consulte rápidamente tendencias analíticas interactivas.
+                        </p>
                     </div>
-                    <h2 class="panel-title">Visor - Estaciones</h2>
-                </header>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Map Row -->
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
                 <div class="panel-body p-none"
-                    style="height: calc(100vh - 180px); min-height: 500px; position: relative; overflow: hidden; border-radius: 0 0 12px 12px;">
+                    style="height: calc(100vh - 280px); min-height: 500px; position: relative; overflow: hidden; border-radius: 0 0 12px 12px;">
 
                     <div id="map" style="width: 100%; height: 100%;"></div>
 

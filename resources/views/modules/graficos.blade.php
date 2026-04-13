@@ -8,14 +8,29 @@
     <!-- Main Row -->
     <div class="row">
         <div class="col-md-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    <div class="panel-actions">
-                        <a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+            <!-- Intro Banner -->
+    <div class="row" style="margin-bottom: 25px;">
+        <div class="col-md-12">
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #17a2b8; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                            <i class="fa fa-signal" style="color: #17a2b8;"></i> Laboratorio de Gráficos
+                        </h2>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
+                            Despliegue análisis comparativos, trace líneas de tendencia y verifique el histórico analítico en múltiples ejes.
+                        </p>
                     </div>
-                    <h2 class="panel-title">Gráfico histórico</h2>
-                </header>
-                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Row -->
+    <div class="row">
+        <div class="col-md-12">
+            <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                <div class="panel-body" style="padding: 25px;">
 
                     <!-- Filter Toolbar (Sync with Control Calidad) -->
                     <div class="filter-toolbar mb-4">
@@ -46,19 +61,26 @@
                                 <select multiple id="filtro-programas" class="form-control selectpicker"
                                     data-live-search="true" data-width="100%"></select>
                             </div>
+
+                            <!-- Normas -->
+                            <div class="filter-item">
+                                <label class="filter-label"><i class="fa fa-balance-scale text-success"></i> NORMAS</label>
+                                <select multiple id="filtro-normas" class="form-control selectpicker" data-live-search="true"
+                                    data-width="100%" title="Seleccionar Normas" data-actions-box="true" data-selected-text-format="count > 1"
+                                    data-count-selected-text="({0}) Normas"></select>
+                            </div>
                             <!-- Graficar Button -->
                             <div class="filter-item">
                                 <label class="filter-label">&nbsp;</label>
-                                <button type="button" id="btn-graficar" class="btn btn-success filter-btn btn-block">
+                                <button type="button" id="btn-graficar" class="btn btn-info filter-btn btn-block" style="background-color: #17a2b8; border-color: #17a2b8; font-family: 'Outfit', sans-serif; font-weight: 600; color: white;">
                                     <i class="fa fa-line-chart mr-1"></i> &nbsp; Graficar
                                 </button>
                             </div>
                             <!-- Config Button -->
                             <div class="filter-item">
                                 <label class="filter-label">&nbsp;</label>
-                                <button type="button" class="btn btn-default filter-btn btn-block" data-toggle="modal"
-                                    data-target="#modalConfiguracion">
-                                    <i class="fa fa-cog mr-1"></i> &nbsp; Configuración
+                                <button type="button" class="btn btn-default filter-btn btn-block" data-toggle="modal" data-target="#modalConfiguracion" style="font-family: 'Outfit', sans-serif; font-weight: 600;">
+                                    <i class="fa fa-cog text-primary mr-1"></i> &nbsp; Configuración
                                 </button>
                             </div>
                         </div>
@@ -180,10 +202,12 @@
     <style>
         /* SYNC WITH CONTROL CALIDAD STYLE */
         .filter-toolbar {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 4px;
-            border: 1px solid #eee;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            margin-bottom: 25px;
         }
 
         .flex-toolbar-container {
@@ -327,6 +351,7 @@
             let currentChart = null;
             let chartData = null;
             let chartMeta = null;
+            let chartNormaData = null;
 
             Highcharts.setOptions({
                 lang: {
@@ -358,10 +383,12 @@
                 $.each(data.estaciones, (i, e) => $('#filtro-estaciones').append($('<option>', { value: e.id_estacion, text: e.nombre_estacion })));
                 $.each(data.parametros, (i, p) => $('#filtro-parametros').append($('<option>', { value: p.id_parametro, text: p.nombre })));
                 $.each(data.programas, (i, p) => $('#filtro-programas').append($('<option>', { value: p.id_programa, text: p.nombre_serie })));
+
+                $.each(data.normas || [], (i, n) => $('#filtro-normas').append($('<option>', { value: n.id_norma, text: n.nombre })));
                 $('.selectpicker').selectpicker('refresh');
             });
 
-            $('#btn-graficar').on('click', function () {
+                        $('#btn-graficar').on('click', function () {
                 let stations = $('#filtro-estaciones').val(), parameters = $('#filtro-parametros').val();
                 if (!stations || !parameters) return Swal.fire('Aviso', 'Seleccione estaciones y parámetros.', 'warning');
 
@@ -369,29 +396,41 @@
 
                 fetch("{{ url('/api/visualizacion/chart-data') }}", {
                     method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-                    body: JSON.stringify({ stations, parametros: parameters, indicador: $('#filtro-programas').val() })
+                    body: JSON.stringify({ 
+                        stations, 
+                        parametros: parameters, 
+                        indicador: $('#filtro-programas').val(),
+                        id_norma: $('#filtro-normas').val() || []
+                    })
                 }).then(res => res.json()).then(data => {
                     Swal.close();
                     chartData = data.raw;
                     chartMeta = data.parametros_info;
+                    chartNormaData = data.norma || null;
                     renderChart();
                     buildModalConfig();
                 });
             });
-
-            function renderChart() {
+                        function renderChart() {
+                if (!chartData || chartData.length === 0) return;
                 const series = [], yAxes = [];
                 const pIDs = Object.keys(chartMeta);
                 const useDual = $('#cfg-use-dual-axis').is(':checked');
 
                 pIDs.forEach((pID, idx) => {
                     const stationsInRaw = [...new Set(chartData.map(item => item.estacion))];
+                    let allDataValues = [];
+
                     stationsInRaw.forEach((stName, sIdx) => {
                         const pts = chartData.filter(item => item.estacion === stName)
                             .map(item => {
                                 const d = item.fecha_label.split('-');
                                 let rv = String(item['parametro_' + pID] || '').replace(',', '.').replace('<', '').replace('>', '');
-                                return [Date.UTC(d[0], d[1] - 1, d[2]), parseFloat(rv)];
+                                let cleanVal = parseFloat(rv);
+                                if (!isNaN(cleanVal)) {
+                                    allDataValues.push(cleanVal);
+                                }
+                                return [Date.UTC(d[0], d[1] - 1, d[2]), cleanVal, item['parametro_' + pID]];
                             })
                             .filter(p => !isNaN(p[1])).sort((a, b) => a[0] - b[0]);
 
@@ -406,8 +445,69 @@
                         }
                     });
 
-                    // Only create second axis if dual is enabled AND we have more than one param
                     if (idx === 0 || (useDual && idx === 1)) {
+                        const normaRanges = chartNormaData?.ranges || {};
+                        const paramRanges = normaRanges[pID] || [];
+                        const plotLines = [];
+                        const unit = chartMeta[pID].unidad ? ' ' + chartMeta[pID].unidad : '';
+
+                        const normaValues = [];
+                        paramRanges.forEach((range) => {
+                           if (range.max !== null && range.max !== undefined) {
+                              const value = Number(range.max);
+                              if (!isNaN(value)) {
+                                 normaValues.push(value);
+                                 plotLines.push({
+                                    id: `norma-${range.id_norma}-${pID}-max`,
+                                    value,
+                                    color: '#e74c3c',
+                                    dashStyle: 'ShortDash',
+                                    width: 2,
+                                    zIndex: 5,
+                                    label: {
+                                       text: `Máx ${range.nombre}: ${range.max}${unit}`,
+                                       align: 'right',
+                                       x: -4,
+                                       style: { color: '#e74c3c', fontWeight: 'bold', fontSize: '11px' }
+                                    }
+                                 });
+                              }
+                           }
+
+                           if (range.min !== null && range.min !== undefined) {
+                              const value = Number(range.min);
+                              if (!isNaN(value)) {
+                                 normaValues.push(value);
+                                 plotLines.push({
+                                    id: `norma-${range.id_norma}-${pID}-min`,
+                                    value,
+                                    color: '#2980b9',
+                                    dashStyle: 'ShortDash',
+                                    width: 2,
+                                    zIndex: 5,
+                                    label: {
+                                       text: `Mín ${range.nombre}: ${range.min}${unit}`,
+                                       align: 'right',
+                                       x: -4,
+                                       style: { color: '#2980b9', fontWeight: 'bold', fontSize: '11px' }
+                                    }
+                                 });
+                              }
+                           }
+                        });
+
+                        let axisSoftMin = undefined;
+                        let axisSoftMax = undefined;
+                        const allValues = [...allDataValues, ...normaValues].filter(v => !isNaN(v) && isFinite(v));
+                        if (allValues.length > 0) {
+                           const vMin = Math.min(...allValues);
+                           const vMax = Math.max(...allValues);
+                           const rng = vMax - vMin;
+                           const pad = rng > 0 ? rng * 0.12 : Math.max(Math.abs(vMax) * 0.1, 1);
+                           axisSoftMin = vMin - pad;
+                           axisSoftMax = vMax + pad;
+                        }
+
                         yAxes.push({
                             title: { 
                                 text: chartMeta[pID].nombre_largo + ' [' + chartMeta[pID].unidad + ']', 
@@ -415,17 +515,38 @@
                             },
                             gridLineColor: '#f3f3f3', 
                             labels: { style: { color: '#666' } }, 
-                            opposite: idx === 1
+                            opposite: idx === 1,
+                            plotLines: plotLines.length ? plotLines : undefined,
+                            softMin: axisSoftMin,
+                            softMax: axisSoftMax
                         });
                     }
                 });
 
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+
                 currentChart = Highcharts.chart('main-chart', {
                     chart: { borderWidht: 0, spacingTop: 20 },
                     title: { text: null },
+                    subtitle: {
+                        text: chartNormaData?.nombres ? 'Normas activas: ' + Object.values(chartNormaData.nombres).join(', ') : null
+                    },
                     xAxis: { type: 'datetime' },
                     yAxis: yAxes,
-                    tooltip: { shared: true },
+                    tooltip: { 
+                       shared: true,
+                       useHTML: true,
+                       formatter: function() {
+                           let s = `<b>${Highcharts.dateFormat('%Y-%m-%d', this.x)}</b><br/>`;
+                           this.points.forEach(p => {
+                               let unitStr = p.series.userOptions.unit ? ' ' + p.series.userOptions.unit : '';
+                               s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${p.point.options[2]}${unitStr}</b><br/>`;
+                           });
+                           return s;
+                       }
+                    },
                     legend: { enabled: true },
                     series: series,
                     exporting: {

@@ -3,13 +3,29 @@
 @section('page_title', 'Control de Calidad')
 @section('content')
    @include('partials.modules')
+   <!-- Intro Banner -->
+   <div class="row" style="margin-bottom: 25px;">
+      <div class="col-md-12">
+         <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #f39c12; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+               <div>
+                  <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                     <i class="fa fa-shield" style="color: #f39c12;"></i> Control de Calidad Analítico
+                  </h2>
+                  <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
+                     Revise exhaustivamente los registros, audite inconsistencias y aplique sellos de aprobación estandarizados.
+                  </p>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
    <!-- Main Row -->
    <div class="row">
       <div class="col-md-12">
-         <section class="panel">
-            <header class="panel-heading">
-               <h2 class="panel-title">Control de Calidad</h2>
-            </header>
+         <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            
             <div class="panel-body">
                <!-- Filter Toolbar -->
                <div class="filter-toolbar" style="margin-bottom: 20px;">
@@ -73,7 +89,7 @@
                      <!-- Buttons as equal items -->
                      <div class="filter-item">
                         <label class="filter-label">&nbsp;</label>
-                        <button type="button" id="btn-filtrar" class="btn btn-default filter-btn btn-block">
+                        <button type="button" id="btn-filtrar" class="btn btn-warning filter-btn btn-block" style="background-color: #f39c12; border-color: #f39c12; font-family: 'Outfit', sans-serif; font-weight: 600; color: white;">
                            <i class="fa fa-filter text-success mr-1"></i> &nbsp; Filtrar
                         </button>
                      </div>
@@ -158,6 +174,15 @@
                         <label class="filter-label"><i class="fa fa-tasks text-success"></i> PROGRAMAS</label>
                         <select multiple id="filtro-indicador-chart" class="form-control selectpicker"
                            data-live-search="true" data-width="100%">
+                           <!-- Dynamic -->
+                        </select>
+                     </div>
+                     <!-- Norma -->
+                     <div class="filter-item">
+                        <label class="filter-label"><i class="fa fa-balance-scale text-success"></i> NORMA</label>
+                        <select multiple id="filtro-norma-chart" class="form-control selectpicker" data-live-search="true"
+                           data-width="100%" title="Seleccionar normas" data-actions-box="true" data-selected-text-format="count > 1"
+                           data-count-selected-text="({0}) normas">
                            <!-- Dynamic -->
                         </select>
                      </div>
@@ -1751,6 +1776,9 @@
                $('#filtro-indicador-chart').append($('<option>', { value: p.id_programa, text: p.nombre_serie }));
                $('#filtro-indicador-qaqc').append($('<option>', { value: p.id_programa, text: p.nombre_serie }));
             });
+            $.each(data.normas || [], function (i, n) {
+               $('#filtro-norma-chart').append($('<option>', { value: n.id_norma, text: n.nombre }));
+            });
             $.each(data.parametros, function (i, p) {
                $('#filtro-parametros-chart').append($('<option>', { value: p.id_parametro, text: p.nombre }));
                $('#filtro-parametros-qaqc').append($('<option>', { value: p.id_parametro, text: p.nombre }));
@@ -1871,17 +1899,19 @@
             let stations = $('#filtro-estaciones-chart').val(),
                parametros = $('#filtro-parametros-chart').val(),
                indicador = $('#filtro-indicador-chart').val(),
-               estatus = $('#filtro-estatus-chart').val();
+               estatus = $('#filtro-estatus-chart').val(),
+               id_norma = $('#filtro-norma-chart').val() || [];
 
             if (!stations || !parametros) return Swal.fire({ icon: 'warning', text: 'Seleccione filtros.' });
             let $btn = $(this); $btn.prop('disabled', true).html('Graficando...');
             fetch("{{ url('/api/control-calidad/chart-data') }}", {
                method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-               body: JSON.stringify({ stations, parametros, indicador, estatus })
+               body: JSON.stringify({ stations, parametros, indicador, estatus, id_norma })
             }).then(res => res.json()).then(data => {
                $btn.prop('disabled', false).html('<i class="fa fa-line-chart mr-1"></i> &nbsp; Graficar');
                chartDataHist = data.raw;
                chartMetaHist = data.parametros_info;
+               chartNormaData = data.norma || null;
                renderHistoricalChart();
                buildModalConfigHist();
             });
@@ -1895,6 +1925,8 @@
 
             pIDs.forEach((pID, idx) => {
                const stationsInRaw = [...new Set(chartDataHist.map(item => item.estacion))];
+               let allDataValues = []; // Recopilar todos los valores de datos para este parámetro
+
                stationsInRaw.forEach((stName, sIdx) => {
                   const points = chartDataHist
                      .filter(item => item.estacion === stName)
@@ -1902,6 +1934,9 @@
                         const d = item.fecha_label.split('-');
                         let rawVal = String(item['parametro_' + pID] || '').replace(',', '.');
                         let cleanVal = parseFloat(rawVal.replace('<', '').replace('>', ''));
+                        if (!isNaN(cleanVal)) {
+                           allDataValues.push(cleanVal); // Agregar a la lista de valores de datos
+                        }
                         return { x: Date.UTC(d[0], d[1] - 1, d[2]), y: cleanVal, str: item['parametro_' + pID] };
                      })
                      .filter(p => !isNaN(p.y))
@@ -1919,6 +1954,73 @@
                });
 
                if (idx === 0 || (useDual && idx === 1)) {
+                  const normaRanges = chartNormaData?.ranges || {};
+                  const paramRanges = normaRanges[pID] || [];
+                  const plotLines = [];
+                  const unit = chartMetaHist[pID].unidad ? ' ' + chartMetaHist[pID].unidad : '';
+
+                  // Recopilar valores de normas (con guard contra NaN)
+                  const normaValues = [];
+                  paramRanges.forEach((range) => {
+                     if (range.max !== null && range.max !== undefined) {
+                        const value = Number(range.max);
+                        if (!isNaN(value)) {
+                           normaValues.push(value);
+                           plotLines.push({
+                              id: `norma-${range.id_norma}-${pID}-max`,
+                              value,
+                              color: '#e74c3c',
+                              dashStyle: 'ShortDash',
+                              width: 2,
+                              zIndex: 5,
+                              label: {
+                                 text: `Máx ${range.nombre}: ${range.max}${unit}`,
+                                 align: 'right',
+                                 x: -4,
+                                 style: { color: '#e74c3c', fontWeight: 'bold', fontSize: '11px' }
+                              }
+                           });
+                        }
+                     }
+
+                     if (range.min !== null && range.min !== undefined) {
+                        const value = Number(range.min);
+                        if (!isNaN(value)) {
+                           normaValues.push(value);
+                           plotLines.push({
+                              id: `norma-${range.id_norma}-${pID}-min`,
+                              value,
+                              color: '#2980b9',
+                              dashStyle: 'ShortDash',
+                              width: 2,
+                              zIndex: 5,
+                              label: {
+                                 text: `Mín ${range.nombre}: ${range.min}${unit}`,
+                                 align: 'right',
+                                 x: -4,
+                                 style: { color: '#2980b9', fontWeight: 'bold', fontSize: '11px' }
+                              }
+                           });
+                        }
+                     }
+                  });
+
+                  // Calcular softMin/softMax incluyendo datos y normas.
+                  // softMin/softMax: el eje se expande si los datos lo requieren,
+                  // pero garantiza que las normas sean siempre visibles.
+                  let axisSoftMin = undefined;
+                  let axisSoftMax = undefined;
+                  const allValues = [...allDataValues, ...normaValues].filter(v => !isNaN(v) && isFinite(v));
+                  if (allValues.length > 0) {
+                     const vMin = Math.min(...allValues);
+                     const vMax = Math.max(...allValues);
+                     const rng = vMax - vMin;
+                     // Padding: 12% del rango, o fallback cuando todos los valores son iguales
+                     const pad = rng > 0 ? rng * 0.12 : Math.max(Math.abs(vMax) * 0.1, 1);
+                     axisSoftMin = vMin - pad;
+                     axisSoftMax = vMax + pad;
+                  }
+
                   yAxes.push({
                      title: {
                         text: chartMetaHist[pID].nombre_largo + ' [' + chartMetaHist[pID].unidad + ']',
@@ -1926,13 +2028,19 @@
                      },
                      gridLineColor: '#f3f3f3',
                      labels: { style: { color: '#666' } },
-                     opposite: idx === 1
+                     opposite: idx === 1,
+                     plotLines: plotLines.length ? plotLines : undefined,
+                     softMin: axisSoftMin,
+                     softMax: axisSoftMax
                   });
                }
             });
 
             currentHistoricalChart = Highcharts.chart('chart-historico', {
                title: { text: null },
+               subtitle: {
+                  text: chartNormaData?.ids?.length ? 'Normas activas: ' + (chartNormaData.nombres ? Object.values(chartNormaData.nombres).join(', ') : chartNormaData.ids.join(', ')) : null
+               },
                xAxis: { type: 'datetime', labels: { style: { fontSize: '14px', color: '#333' } } },
                yAxis: yAxes,
                tooltip: {

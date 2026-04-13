@@ -9,7 +9,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/dashboard');
+    return redirect('/inicio');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -19,6 +19,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/dashboard/summary', [DashboardController::class, 'getSummary']);
+
+    Route::get('/inicio', function () {
+        return view('modules.inicio');
+    })->name('inicio');
 
     Route::get('/carga-datos', function () {
         return view('modules.carga-datos');
