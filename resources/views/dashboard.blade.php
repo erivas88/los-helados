@@ -174,6 +174,29 @@
 <script src="https://cdn.jsdelivr.net/npm/highcharts@11/highcharts.js"></script>
 <script>
     $(document).ready(function() {
+        Highcharts.setOptions({
+            lang: {
+                months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                thousandsSep: '.',
+                decimalPoint: ',',
+                downloadPNG: 'Descargar imagen PNG',
+                downloadJPEG: 'Descargar imagen JPEG',
+                downloadPDF: 'Descargar documento PDF',
+                downloadSVG: 'Descargar imagen SVG',
+                printChart: 'Imprimir gráfico',
+                viewFullscreen: 'Ver en pantalla completa',
+                exportButtonTitle: 'Exportar gráfico',
+                contextButtonTitle: 'Menú contextual',
+                resetZoom: 'Restablecer zoom',
+                resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+                loading: 'Cargando...',
+                noData: 'No hay datos para mostrar'
+            },
+            chart: { style: { fontFamily: "'Inter', sans-serif" } }
+        });
+
         // Fetch dashboard summary
         $.get('{{ url("/api/dashboard/summary") }}', function(data) {
             // Update Stats

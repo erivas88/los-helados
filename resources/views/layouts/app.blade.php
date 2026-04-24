@@ -64,8 +64,8 @@
 		<!-- start: header -->
 		<header class="header">
 			<div class="logo-container">
-				<a href="{{ url('/') }}" class="logo">
-					<img src="{{ asset('png/gp-negro.png') }}" height="45" style="padding-bottom: 10px;" />
+				<a href="{{ url('/') }}" class="logo" style="display: inline-block; margin-top: -2px;">
+					<img src="{{ asset('png/gp-fullcolor.png') }}" height="60" alt="Logo" />
 				</a>
 				<div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html"
 					data-fire-event="sidebar-left-opened">
@@ -87,8 +87,10 @@
 				<div id="userbox" class="userbox">
 					<a href="#" data-toggle="dropdown">
 						<figure class="profile-picture">
-							<img src="{{ asset('assets/images/!logged-user.jpg') }}" alt="Joseph Doe" class="img-circle"
-								data-lock-picture="{{ asset('assets/images/!logged-user.jpg') }}" />
+							<div
+								style="background: #ebeef2; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; margin-top: 2px;">
+								<i class="fa fa-user" style="color: #abbcc7; font-size: 16px;"></i>
+							</div>
 						</figure>
 						<div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
 							<span class="name">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>
@@ -101,13 +103,7 @@
 					<div class="dropdown-menu">
 						<ul class="list-unstyled">
 							<li class="divider"></li>
-							<li>
-								<a role="menuitem" tabindex="-1" href="#"><i class="fa fa-user"></i> My Profile</a>
-							</li>
-							<li>
-								<a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i
-										class="fa fa-lock"></i> Lock Screen</a>
-							</li>
+
 							<li>
 								<a role="menuitem" tabindex="-1" href="#"
 									onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
@@ -130,8 +126,9 @@
 			<aside id="sidebar-left" class="sidebar-left">
 
 				<div class="sidebar-header">
-					<div class="sidebar-title">
-						Menu
+					<div class="sidebar-title"
+						style="color: white !important; font-weight: 700; letter-spacing: 0.5px;">
+						Opciones
 					</div>
 					<div class="sidebar-toggle hidden-xs" data-toggle-class="sidebar-left-collapsed" data-target="html"
 						data-fire-event="sidebar-left-toggle">
@@ -143,48 +140,77 @@
 					<div class="nano-content">
 						<nav id="menu" class="nav-main" role="navigation">
 							<ul class="nav nav-main">
-								<li class="{{ Request::is('inicio') || Request::is('/') ? 'nav-active' : '' }}">
-									<a href="{{ url('/inicio') }}">
-										<i class="fa fa-star" aria-hidden="true"></i>
-										<span>Inicio</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('dashboard') ? 'nav-active' : '' }}">
-									<a href="{{ url('/dashboard') }}">
-										<i class="fa fa-home" aria-hidden="true"></i>
-										<span>Dashboard</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('carga-datos') ? 'nav-active' : '' }}">
-									<a href="{{ url('/carga-datos') }}">
-										<i class="fa fa-upload" aria-hidden="true"></i>
-										<span>Carga de Datos</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('control-calidad') ? 'nav-active' : '' }}">
-									<a href="{{ url('/control-calidad') }}">
-										<i class="fa fa-check-square" aria-hidden="true"></i>
-										<span>Control de Calidad</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('visualizacion') ? 'nav-active' : '' }}">
-									<a href="{{ url('/visualizacion') }}">
-										<i class="fa fa-eye" aria-hidden="true"></i>
-										<span>Visualización</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('graficos') ? 'nav-active' : '' }}">
-									<a href="{{ url('/graficos') }}">
-										<i class="fa fa-signal" aria-hidden="true"></i>
-										<span>Gráficos</span>
-									</a>
-								</li>
-								<li class="{{ Request::is('estaciones-proyecto') ? 'nav-active' : '' }}">
-									<a href="{{ url('/estaciones-proyecto') }}">
-										<i class="fa fa-map-marker" aria-hidden="true"></i>
-										<span>Estaciones Proyecto</span>
-									</a>
-								</li>
+								@if(auth()->user()->hasPermission('inicio'))
+									<li class="{{ Request::is('inicio') || Request::is('/') ? 'nav-active' : '' }}">
+										<a href="{{ url('/inicio') }}">
+											<i class="fa fa-star" aria-hidden="true"></i>
+											<span>Inicio</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('dashboard'))
+									<li class="{{ Request::is('dashboard') ? 'nav-active' : '' }}">
+										<a href="{{ url('/dashboard') }}">
+											<i class="fa fa-home" aria-hidden="true"></i>
+											<span>Dashboard</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('carga-datos'))
+									<li class="{{ Request::is('carga-datos') ? 'nav-active' : '' }}">
+										<a href="{{ url('/carga-datos') }}">
+											<i class="fa fa-upload" aria-hidden="true"></i>
+											<span>Carga de Datos</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('control-calidad'))
+									<li class="{{ Request::is('control-calidad') ? 'nav-active' : '' }}">
+										<a href="{{ url('/control-calidad') }}">
+											<i class="fa fa-check-square" aria-hidden="true"></i>
+											<span>Control de Calidad</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('visualizacion'))
+									<li class="{{ Request::is('visualizacion') ? 'nav-active' : '' }}">
+										<a href="{{ url('/visualizacion') }}">
+											<i class="fa fa-eye" aria-hidden="true"></i>
+											<span>Visualización</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('graficos'))
+									<li class="{{ Request::is('graficos') ? 'nav-active' : '' }}">
+										<a href="{{ url('/graficos') }}">
+											<i class="fa fa-signal" aria-hidden="true"></i>
+											<span>Gráficos</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('estaciones-proyecto'))
+									<li class="{{ Request::is('estaciones-proyecto') ? 'nav-active' : '' }}">
+										<a href="{{ url('/estaciones-proyecto') }}">
+											<i class="fa fa-map-marker" aria-hidden="true"></i>
+											<span>Estaciones Proyecto</span>
+										</a>
+									</li>
+								@endif
+
+								@if(auth()->user()->hasPermission('gestion-usuarios'))
+									<li class="{{ Request::is('users*') ? 'nav-active' : '' }}">
+										<a href="{{ route('users.index') }}">
+											<i class="fa fa-users" aria-hidden="true"></i>
+											<span>Gestión de Usuarios</span>
+										</a>
+									</li>
+								@endif
 							</ul>
 						</nav>
 
@@ -209,8 +235,8 @@
 									<i class="fa fa-home"></i>
 								</a>
 							</li>
-							<li><span>Layouts</span></li>
-							<li><span>Default</span></li>
+							<li><span>Plataforma de Seguimiento Ambiental</span></li>
+							<li><span>@yield('page_title', 'Inicio')</span></li>
 						</ol>
 
 						<a class="sidebar-right-toggle"><i class="fa fa-chevron-left"></i></a>
@@ -243,6 +269,61 @@
 
 	<!-- Theme Initialization Files -->
 	<script src="{{ asset('assets/javascripts/theme.init.js') }}"></script>
+
+	<script>
+		// Función para normalizar texto sin tildes
+		window.normalizeText = function(text) {
+			return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+		};
+
+		$(document).ready(function() {
+			// Agregar tokens normalizados a selectores de parámetros
+			function addNormalizedTokens() {
+				$('.selectpicker[data-live-search="true"]').each(function() {
+					const $select = $(this);
+					const id = $select.attr('id');
+					
+					if (id && (id.includes('parametro') || id === 'param-selector')) {
+						$select.find('option').each(function() {
+							const text = $(this).text();
+							const normalized = window.normalizeText(text);
+							$(this).attr('data-tokens', normalized);
+						});
+						
+						$select.selectpicker('refresh');
+					}
+				});
+			}
+
+			// Ejecutar al cargar
+			addNormalizedTokens();
+
+			// Re-ejecutar cuando se agregan opciones dinámicamente
+			const observer = new MutationObserver(function(mutations) {
+				mutations.forEach(function(mutation) {
+					if (mutation.type === 'childList' && $(mutation.target).is('select')) {
+						const $select = $(mutation.target);
+						const id = $select.attr('id');
+						
+						if (id && (id.includes('parametro') || id === 'param-selector')) {
+							$select.find('option:not([data-tokens])').each(function() {
+								const text = $(this).text();
+								const normalized = window.normalizeText(text);
+								$(this).attr('data-tokens', normalized);
+							});
+							
+							$select.selectpicker('refresh');
+						}
+					}
+				});
+			});
+
+			// Observar cambios en todos los selectos
+			$('select').each(function() {
+				observer.observe(this, { childList: true });
+			});
+		});
+	</script>
 
 	@stack('js')
 

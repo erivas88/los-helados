@@ -1,19 +1,21 @@
 @extends('layouts.app')
-@section('title', 'Visualización - Porto Admin')
+@section('title', 'Visualización')
 @section('page_title', 'Visualización')
 @section('content')
    @include('partials.modules')
    <!-- Intro Banner -->
    <div class="row" style="margin-bottom: 25px;">
       <div class="col-md-12">
-         <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #28a745; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+         <div
+            style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #28a745; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                <div>
-                  <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
-                     <i class="fa fa-eye" style="color: #28a745;"></i> Tableros de Visualización
+                  <h2
+                     style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                     <i class="fa fa-eye" style="color: #28a745;"></i> Visualización de Datos
                   </h2>
                   <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
-                     Consulte dinámicamente los tableros analíticos con datos previamente sometidos a control de calidad.
+                    Consulte y descargue datos analíticos verificados y validados con control de calidad
                   </p>
                </div>
             </div>
@@ -22,7 +24,7 @@
    </div>
 
    <!-- Main Row -->
-   <div class="row">
+   <div class="row" style="display: none">
       <div class="col-md-12">
          <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
             <div class="panel-body" style="padding: 25px;">
@@ -75,8 +77,16 @@
                      <!-- Buttons as equal items -->
                      <div class="filter-item">
                         <label class="filter-label">&nbsp;</label>
-                        <button type="button" id="btn-filtrar" class="btn btn-success filter-btn btn-block" style="background-color: #28a745; border-color: #28a745; font-family: 'Outfit', sans-serif; font-weight: 600;">
+                        <button type="button" id="btn-filtrar" class="btn btn-success filter-btn btn-block"
+                           style="background-color: #28a745; border-color: #28a745; font-family: 'Outfit', sans-serif; font-weight: 600;">
                            <i class="fa fa-search mr-1"></i> &nbsp; Consultar
+                        </button>
+                     </div>
+                     <div class="filter-item">
+                        <label class="filter-label">&nbsp;</label>
+                        <button type="button" id="btn-export-xlsx" class="btn btn-default filter-btn btn-block"
+                           style="background-color: #fff; border: 1px solid #E5E7E9; font-family: 'Outfit', sans-serif; font-weight: 600;">
+                           <i class="fa fa-file-excel-o text-success mr-1"></i> &nbsp; Exportar
                         </button>
                      </div>
                   </div>
@@ -92,7 +102,8 @@
       <div class="col-md-12">
          <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
             <div class="panel-body" style="padding: 25px;">
-               <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #f1f4f9; padding-bottom: 10px;">
+               <h3
+                  style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #f1f4f9; padding-bottom: 10px;">
                   <i class="fa fa-line-chart text-success"></i> Gráficos Analíticos
                </h3>
                <!-- Filter Toolbar for Chart -->
@@ -137,8 +148,8 @@
                      <div class="filter-item">
                         <label class="filter-label"><i class="fa fa-balance-scale text-success"></i> NORMA</label>
                         <select multiple id="filtro-norma-chart" class="form-control selectpicker" data-live-search="true"
-                           data-width="100%" title="Seleccionar normas" data-actions-box="true" data-selected-text-format="count > 1"
-                           data-count-selected-text="({0}) normas">
+                           data-width="100%" title="Seleccionar normas" data-actions-box="true"
+                           data-selected-text-format="count > 1" data-count-selected-text="({0}) normas">
                            <!-- Dynamic -->
                         </select>
                      </div>
@@ -173,7 +184,7 @@
          padding: 20px;
          border-radius: 8px;
          border: 1px solid #e2e8f0;
-         box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
          margin-bottom: 25px;
       }
 
@@ -292,15 +303,58 @@
          justify-content: center;
       }
 
-      .cell-modified {
-         background-color: #ffff00 !important;
-         color: #000 !important;
-         font-weight: bold;
+      /* Premium Dropdown Styling */
+      .btn-group.btn-block .dropdown-menu {
+         border-radius: 8px;
+         box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+         border: 1px solid #eef2f7 !important;
+         margin-top: 5px;
+         padding: 8px 0;
+         min-width: 160px;
       }
+
+      .dropdown-menu li a {
+         padding: 10px 20px !important;
+         font-size: 13px !important;
+         font-weight: 500 !important;
+         transition: all 0.2s ease;
+         display: flex;
+         align-items: center;
+      }
+
+      .dropdown-menu li a i {
+         width: 20px;
+         margin-right: 10px;
+         font-size: 15px;
+      }
+
+      .dropdown-menu li a:hover {
+         background-color: #f1f4f9 !important;
+         color: #28a745 !important;
+      }
+
+      @media (max-width: 992px) {
+         .flex-toolbar-container {
+            flex-wrap: wrap;
+         }
+         .filter-item {
+            flex: 1 0 30%;
+            margin-bottom: 10px;
+         }
+      }
+
+      @media (max-width: 576px) {
+         .filter-item {
+            flex: 1 0 100%;
+         }
+      }
+
+
    </style>
 @endpush
 @push('js')
    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+   <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <script src="https://cdn.jsdelivr.net/npm/highcharts@11/highcharts.js"></script>
@@ -355,26 +409,35 @@
                }
             }
 
-            const field = cell.getField();
-            const parts = field.split('_');
-            if (parts.length >= 2) {
-               const id = parts[1];
-               const data = cell.getData();
-               if (data["band_edit_" + id] == 1) {
-                  cell.getElement().classList.add("cell-modified");
-               } else {
-                  cell.getElement().classList.remove("cell-modified");
-               }
-            }
             return val;
          };
 
          let table;
          $.get('{{ url("/api/visualizacion/columns") }}', function (columns) {
             columns.forEach(col => {
-               if (col.field === 'estatus') col.formatter = estatusFormatter;
+               if (col.field === 'estatus') {
+                  col.formatter = estatusFormatter;
+                  col.download = false;
+               }
                if (col.formatter === 'paramModifiedFormatter') col.formatter = window.paramModifiedFormatter;
+
+               if (col.title) {
+                  let htmlTitle = col.title; 
+                  let plainTitleWithUnits = htmlTitle.replace(/<[^>]*>/g, '').replace(/&lt;[^&gt;]*&gt;/g, '').trim();
+                  
+                  col.title = plainTitleWithUnits; // Primary title now has units (no HTML) for Excel
+                  col.downloadTitle = plainTitleWithUnits; 
+                  
+                  col.titleFormatter = function(column) {
+                     const div = document.createElement("div");
+                     div.innerHTML = htmlTitle;
+                     return div;
+                  };
+               }
             });
+
+            // Ensure XLSX is globally available for Tabulator download module
+            if (typeof XLSX !== 'undefined') window.XLSX = XLSX;
 
             table = new Tabulator("#tabla-muestras", {
                layout: "fitColumns",
@@ -409,7 +472,8 @@
                $('#filtro-indicador-chart').append($('<option>', { value: p.id_programa, text: p.nombre_serie }));
             });
             $.each(data.parametros, function (i, p) {
-               $('#filtro-parametros-chart').append($('<option>', { value: p.id_parametro, text: p.nombre }));
+               const normalized = window.normalizeText ? window.normalizeText(p.nombre) : p.nombre;
+               $('#filtro-parametros-chart').append($('<option>', { value: p.id_parametro, text: p.nombre, 'data-tokens': normalized }));
             });
 
             $.each(data.normas || [], function (i, n) {
@@ -428,7 +492,13 @@
             }).then(res => res.json()).then(data => table.setData(data));
          });
 
-                  // State variables for chart
+         // Export handler
+         $('#btn-export-xlsx').on('click', function () {
+            if (!table) return;
+            table.download("xlsx", "datos_visualizacion.xlsx", { sheetName: "Datos" });
+         });
+
+         // State variables for chart
          let chartDataHist = [];
          let chartMetaHist = {};
          let chartNormaData = null;
@@ -457,8 +527,11 @@
             });
          });
 
-                  function renderHistoricalChart() {
+         function renderHistoricalChart() {
             if (!chartDataHist || chartDataHist.length === 0) return;
+            
+            const axisFontSize = '13px';
+            const legendFontSize = '13px';
             const series = [], yAxes = [];
             const pIDs = Object.keys(chartMetaHist);
             // Default useDual to true if >1 parameters are selected so we get separate axes
@@ -489,6 +562,13 @@
                         data: points,
                         yAxis: (useDual && idx > 0) ? 1 : 0,
                         type: 'line',
+                        marker: {
+                           enabled: true,
+                           radius: 5,
+                           fillColor: 'white',
+                           lineColor: null,
+                           lineWidth: 2
+                        },
                         userOptions: { unit: chartMetaHist[pID].unidad }
                      });
                   }
@@ -560,10 +640,10 @@
                   yAxes.push({
                      title: {
                         text: chartMetaHist[pID].nombre_largo + ' [' + chartMetaHist[pID].unidad + ']',
-                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold' }
+                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold', fontSize: axisFontSize }
                      },
                      gridLineColor: '#f3f3f3',
-                     labels: { style: { color: '#666' } },
+                     labels: { style: { fontSize: axisFontSize, color: '#666' } },
                      opposite: idx === 1,
                      plotLines: plotLines.length ? plotLines : undefined,
                      softMin: axisSoftMin,
@@ -577,16 +657,16 @@
             }
 
             currentHistoricalChart = Highcharts.chart('chart-historico', {
-               title: { 
-                  text: 'Gráfico histórico (Datos Aprobados)',
+               title: {
+                  text: 'Histórico de Parámetros',
                   style: { fontSize: '18px', fontWeight: 'bold' }
                },
                subtitle: {
                   text: chartNormaData?.nombres ? 'Normas activas: ' + Object.values(chartNormaData.nombres).join(', ') : null
                },
-               xAxis: { 
-                  type: 'datetime', 
-                  labels: { style: { fontSize: '14px', color: '#333' } } 
+               xAxis: {
+                  type: 'datetime',
+                  labels: { style: { fontSize: axisFontSize, color: '#333' } }
                },
                yAxis: yAxes,
                tooltip: {
@@ -602,7 +682,7 @@
                      return s;
                   }
                },
-               legend: { enabled: true, itemStyle: { fontSize: '14px', fontWeight: 'normal' } },
+               legend: { enabled: true, itemStyle: { fontSize: legendFontSize, fontWeight: 'normal' } },
                credits: { enabled: false },
                exporting: {
                   enabled: true,

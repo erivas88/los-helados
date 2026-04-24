@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Estaciones del Proyecto - Mapa Interactivo')
+@section('title', 'Estaciones del Proyecto - Visor Geográfico')
 @section('page_title', 'Estaciones del Proyecto')
 
 @push('css')
@@ -11,200 +11,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
 
     <style>
-        /* Full height adjustments */
-        body,
-        html {
-            height: 100%;
-        }
-
-        /* The Map */
+        /* CLEAN PROFESSIONAL MAP STYLE */
         #map {
-            background: #0b0c1b;
+            background: #f1f5f9;
             width: 100%;
             height: 100%;
             z-index: 1;
         }
 
-        /* GLOBAL LEAFLET FONT */
         .leaflet-container {
             font-family: 'Inter', sans-serif !important;
         }
 
-        /* Sidebar Glassmorphism Card */
-        .station-sidecard {
-            position: absolute;
-            top: 20px;
-            right: -480px;
-            width: 450px;
-            height: calc(100% - 40px);
-            z-index: 1001;
-            background: rgba(22, 24, 45, 0.9);
-            backdrop-filter: blur(30px) saturate(160%);
-            -webkit-backdrop-filter: blur(30px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 28px;
-            padding: 30px;
-            color: #fff;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            transition: right 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-            overflow: hidden;
-        }
-
-        .station-sidecard.active {
-            right: 20px;
-        }
-
-        .card-content {
-            height: 100%;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #888;
-            font-size: 18px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1002;
-        }
-
-        .close-btn:hover {
-            background: #ff5f56;
-            color: #fff;
-            transform: rotate(90deg);
-        }
-
-        .section-title {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #7d8bb2;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title i {
-            margin-right: 12px;
-            color: #00e5ff;
-        }
-
-        .glass-hr {
-            border: 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            margin: 30px 0;
-        }
-
-        /* Bootstrap Select Styling */
-        .bootstrap-select {
-            background: transparent !important;
-        }
-
-        .bootstrap-select .dropdown-toggle {
-            background-color: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
-            border-radius: 14px !important;
-            padding: 12px 18px !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        .bootstrap-select .dropdown-menu {
-            background-color: #1a1b32 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 18px !important;
-            padding: 10px !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
-        }
-
-        .bootstrap-select .dropdown-menu li a {
-            color: #e1e2e6 !important;
-            padding: 10px 15px !important;
-            border-radius: 10px !important;
-            transition: all 0.2s ease !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        /* FIX HOVER INVISIBILITY */
-        .bootstrap-select .dropdown-menu li a:hover,
-        .bootstrap-select .dropdown-menu li.active a,
-        .bootstrap-select .dropdown-menu li:hover a {
-            background: rgba(0, 229, 255, 0.15) !important;
-            color: #00e5ff !important;
-            outline: none !important;
-        }
-
-        .bootstrap-select .dropdown-menu li.selected a {
-            background: rgba(0, 229, 255, 0.08) !important;
-            color: #00e5ff !important;
-            font-weight: 600 !important;
-        }
-
-        /* CUSTOM DARK STYLING FOR LEAFLET SEARCH & LAYERS */
-        .leaflet-control-search {
-            background: rgba(22, 24, 45, 0.8) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 12px !important;
-        }
-
-        .leaflet-control-search .search-input {
-            background: transparent !important;
-            color: #fff !important;
-            border: none !important;
-            margin: 6px 10px !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        .leaflet-control-search .search-button {
-            filter: invert(1) brightness(2);
-        }
-
-        .leaflet-control-search .search-tooltip {
-            background: #1a1b32 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 8px !important;
-            color: #fff !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        .leaflet-control-search .search-tip:hover {
-            background: rgba(0, 229, 255, 0.1) !important;
-        }
-
-        .leaflet-control-layers {
-            background: rgba(22, 24, 45, 0.8) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 12px !important;
-            color: #fff !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        .leaflet-control-layers-expanded {
-            padding: 10px 15px !important;
-        }
-
-        /* Floating Marker Styling */
+        /* PREMIUM MARKERS (CLEAN BLUE) */
         .pulsing-marker {
-            width: 16px;
-            height: 16px;
-            background: #2ecc71;
-            border: 3px solid rgba(255, 255, 255, 0.8);
+            width: 14px;
+            height: 14px;
+            background: #0088cc;
+            border: 3px solid #fff;
             border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 136, 204, 0.4);
             position: relative;
         }
 
@@ -213,46 +39,14 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: #2ecc71;
+            background: #0088cc;
             position: absolute;
-            top: 0;
-            left: 0;
-            animation: pulse-green 1.8s infinite;
+            animation: clean-pulse 2s infinite;
         }
 
-        @keyframes pulse-green {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: scale(3.5);
-                opacity: 0;
-            }
-        }
-
-        .pulsing-marker.active {
-            background: #00e5ff !important;
-            border-color: #fff !important;
-            transform: scale(1.2);
-        }
-
-        .pulsing-marker.active::after {
-            background: #00e5ff !important;
-            animation: pulse-blue 1.5s infinite !important;
-        }
-
-        @keyframes pulse-blue {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: scale(4.5);
-                opacity: 0;
-            }
+        @keyframes clean-pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(3.5); opacity: 0; }
         }
 
         .marker-label {
@@ -260,48 +54,125 @@
             top: 22px;
             left: 50%;
             transform: translateX(-50%);
-            color: #fff;
-            background: rgba(11, 12, 27, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 4px 12px;
-            border-radius: 8px;
+            color: #1e293b;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 800;
             white-space: nowrap;
             pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 4px #fff, 0 0 4px #fff, 0 0 4px #fff;
             font-family: 'Inter', sans-serif !important;
         }
 
-        /* Fix admin template global styles affecting map tiles */
-        .leaflet-tile {
+        /* MODAL CUSTOM STYLING */
+        #chartModal .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        #chartModal .modal-header {
+            background: #fff;
+            border-bottom: 1px solid #f1f5f9;
+            border-radius: 12px 12px 0 0;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #chartModal .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #1e293b;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .coordinates-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f7ff;
+            color: #0088cc;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid #d0e7ff;
+        }
+
+        .modal-close-wrapper {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #94a3b8;
+        }
+
+        .modal-close-wrapper:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        /* LOADER */
+        #map-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* MAP CONTROLS OVERRIDE */
+        .leaflet-control-layers, .leaflet-control-zoom {
             border: none !important;
-            outline: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            background: transparent !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+            border-radius: 8px !important;
+        }
+
+        /* TOOLTIP LEAFLET CUSTOM */
+        .leaflet-custom-tooltip {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #fff !important;
+            border-radius: 6px !important;
+            font-size: 11px !important;
+            padding: 8px 12px !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .leaflet-custom-tooltip:before {
+            border-top-color: #1e293b !important;
         }
     </style>
 @endpush
 
-@push('css')
-@endpush
-
 @section('content')
-    <div class="row">
-        <div class="col-md-12">
-            <!-- Intro Banner -->
+    <!-- Intro Banner (Cintillo Estándar) -->
     <div class="row" style="margin-bottom: 25px;">
         <div class="col-md-12">
             <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #0088cc; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                     <div>
                         <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
-                            <i class="fa fa-map-o" style="color: #0088cc;"></i> Visor Geográfico
+                            <i class="fa fa-map-marker" style="color: #0088cc;"></i> Ubicación Estaciones
                         </h2>
                         <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
-                            Explore espacialmente las estaciones de monitoreo y consulte rápidamente tendencias analíticas interactivas.
+                            Consulte en el mapa la ubicación de las estaciones y sus datos analíticos históricos
                         </p>
                     </div>
                 </div>
@@ -309,53 +180,66 @@
         </div>
     </div>
 
-    <!-- Main Map Row -->
     <div class="row">
         <div class="col-md-12">
-            <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-                <div class="panel-body p-none"
-                    style="height: calc(100vh - 280px); min-height: 500px; position: relative; overflow: hidden; border-radius: 0 0 12px 12px;">
+            <section class="panel" style="border-radius: 12px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;">
+                <div class="panel-body p-none" style="height: calc(100vh - 280px); min-height: 550px; position: relative;">
+                    
+                    <div id="map"></div>
 
-                    <div id="map" style="width: 100%; height: 100%;"></div>
-
-                    <div id="map-loader"
-                        style="position:absolute; top:0; left:0; width:100%; height:100%; background:#0b0c1b; z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                        <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
-                        <p class="mt-4 text-white opacity-40" style="letter-spacing: 1px; font-size: 12px;">Cargando</p>
-                    </div>
-
-                    <div id="station-sidebar" class="station-sidecard" style="height: calc(100% - 40px); top: 20px;">
-                        <button id="close-sidebar" class="close-btn"><i class="fa fa-times"></i></button>
-                        <div class="card-content">
-                            <h2 id="side-station-name" class="mt-0 mb-1"
-                                style="color:#fff; font-weight:200; letter-spacing:1px; font-size: 28px;">Estación</h2>
-                            <div id="side-coordinates" class="mb-4">
-                                <span class="badge"
-                                    style="background: rgba(0, 229, 255, 0.08); border:1px solid rgba(0, 229, 255, 0.15); padding:10px 15px; color:#00e5ff; border-radius: 12px;">
-                                    <i class="fa fa-crosshairs mr-2"></i> <span id="val-utm"
-                                        style="font-weight:400; font-size: 11px;">---</span>
-                                </span>
-                            </div>
-                            <hr class="glass-hr">
-                            <div class="chart-section">
-                                <p class="section-title"><i class="fa fa-stream"></i> Análisis de Variables</p>
-                                <div class="param-selector-wrapper mb-4">
-                                    <label class="small text-muted mb-3" style="display:block; opacity: 0.6;">Seleccionar
-                                        Parámetros (Máximo 2):</label>
-                                    <select id="param-selector" class="form-control selectpicker" multiple
-                                        data-max-options="2" data-live-search="true" data-width="100%" data-size="5"
-                                        data-actions-box="true" data-deselect-all-text="Limpiar Análisis"
-                                        data-selected-text-format="count > 1"
-                                        data-count-selected-text="({0}) Variables seleccionadas"
-                                        title="Seleccionar Parámetros"></select>
-                                </div>
-                                <div id="mini-chart" style="height: 380px; width: 100%;"></div>
-                            </div>
-                        </div>
+                    <div id="map-loader">
+                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+                        <p class="mt-4 text-muted" style="font-weight: 500;">Iniciando Visor Geográfico...</p>
                     </div>
 
                 </div>
             </section>
+        </div>
+    </div>
+
+    <!-- Modal para Gráficos -->
+    <div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <h4 class="modal-title" id="modal-station-name">Nombre Estación</h4>
+                        <div class="coordinates-pill">
+                            <i class="fa fa-crosshairs"></i> <span id="modal-utm">...</span>
+                        </div>
+                    </div>
+                    <div class="modal-close-wrapper" data-dismiss="modal">
+                        <i class="fa fa-times"></i>
+                    </div>
+                </div>
+                <div class="modal-body" style="padding: 30px;">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5 style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #64748b; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; margin-bottom: 15px;">
+                                <i class="fa fa-line-chart text-primary mr-2"></i> Análisis Histórico de Parámetros
+                            </h5>
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #edf2f7;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <label class="small font-weight-bold text-muted mb-0" style="display:block;">Seleccione hasta 2 variables para comparar:</label>
+                                    <button type="button" id="btn-limpiar-selector" class="btn btn-sm btn-outline-secondary" style="padding: 4px 12px; font-size: 11px; font-weight: 600;">
+                                        <i class="fa fa-times mr-1"></i> Limpiar
+                                    </button>
+                                </div>
+                                <select id="param-selector" class="form-control selectpicker" multiple data-max-options="2" data-live-search="true" data-width="100%" data-style="btn-white" data-size="5" data-selected-text-format="count" data-count-selected-text="({0}) parámetros" title="Seleccione Parámetros"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mini-chart" style="height: 400px; width: 100%; border-radius: 8px; border: 1px solid #f1f5f9; background: #fff;"></div>
+                </div>
+                        <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 20px;">
+                            <div class="row text-center">
+                                <div style="flex-grow: 1; text-align: right; padding-right: 25px;">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" style="font-family: 'Outfit', sans-serif; font-weight: 600;">Cerrar Ventana</button>
+                                </div>
+                            </div>
+                        </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -369,54 +253,52 @@
 
     <script>
         $(document).ready(function () {
-            Highcharts.setOptions({ lang: {
-               months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-               weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-               shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-               thousandsSep: '.',
-               decimalPoint: ',',
-               downloadPNG: 'Descargar imagen PNG',
-               downloadJPEG: 'Descargar imagen JPEG',
-               downloadPDF: 'Descargar documento PDF',
-               downloadSVG: 'Descargar imagen SVG',
-               printChart: 'Imprimir gráfico',
-               viewFullscreen: 'Ver en pantalla completa',
-               exportButtonTitle: 'Exportar gráfico',
-               contextButtonTitle: 'Menú contextual',
-               resetZoom: 'Restablecer zoom',
-               resetZoomTitle: 'Restablecer nivel de zoom 1:1',
-               loading: 'Cargando...',
-               noData: 'No hay datos para mostrar'
-            } });
+            Highcharts.setOptions({ 
+                lang: { 
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                    shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    thousandsSep: '.',
+                    decimalPoint: ',',
+                    downloadPNG: 'Descargar imagen PNG',
+                    downloadJPEG: 'Descargar imagen JPEG',
+                    downloadPDF: 'Descargar documento PDF',
+                    downloadSVG: 'Descargar imagen SVG',
+                    printChart: 'Imprimir gráfico',
+                    viewFullscreen: 'Ver en pantalla completa',
+                    exportButtonTitle: 'Exportar gráfico',
+                    contextButtonTitle: 'Menú contextual',
+                    resetZoom: 'Restablecer zoom',
+                    resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+                    loading: 'Cargando...',
+                    noData: 'No hay datos para mostrar'
+                },
+                chart: { style: { fontFamily: "'Inter', sans-serif" } }
+            });
 
             const utm19S = "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs";
             const wgs84 = "+proj=longlat +datum=WGS84 +no_defs";
 
-            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
             const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-            const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
 
-            const map = L.map('map', { center: [-27.3666, -70.3323], zoom: 9, zoomControl: false, attributionControl: false, layers: [satellite] });
+            const map = L.map('map', { 
+                center: [-27.3666, -70.3323], 
+                zoom: 10, 
+                zoomControl: false, 
+                attributionControl: false, 
+                layers: [satellite] 
+            });
 
             const baseMaps = {
-                "<span style='color:#ccc'>Satélite</span>": satellite,
-                "<span style='color:#ccc'>Calles</span>": streets,
-                "<span style='color:#ccc'>Oscuro</span>": dark
+                "Mapa Estándar": streets,
+                "Satélite": satellite
             };
 
-            L.control.layers(baseMaps, null, { position: 'topleft' }).addTo(map);
+            L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
             L.control.zoom({ position: 'topright' }).addTo(map);
 
             const markersLayer = new L.LayerGroup().addTo(map);
-
-            const searchControl = new L.Control.Search({
-                layer: markersLayer, propertyName: 'title', marker: false,
-                moveToLocation: function (latlng, title, map) { map.flyTo(latlng, 15, { duration: 1.5 }); }
-            });
-            searchControl.on('search:locationfound', (e) => { e.layer.fire('click'); });
-            map.addControl(searchControl);
-
-            let activeMarkerElement = null;
 
             fetch("{{ url('/api/estaciones-proyecto/map-data') }}")
                 .then(res => res.json())
@@ -435,8 +317,15 @@
                                 })
                             }).addTo(markersLayer);
 
+                            // Map marker hover tooltip (Optional professional touch)
+                            marker.bindTooltip(`<b>Estación:</b> ${s.nombre_estacion}<br><b>UTM:</b> ${s.utm_este} E | ${s.utm_norte} N`, {
+                                direction: 'top',
+                                offset: [0, -15],
+                                className: 'leaflet-custom-tooltip'
+                            });
+
                             marker.on('click', (e) => {
-                                window.showStation(s, [coords[1], coords[0]], e.target.getElement().querySelector('.pulsing-marker'));
+                                window.showStationModal(s, [coords[1], coords[0]]);
                             });
                             bounds.push([coords[1], coords[0]]);
                         }
@@ -446,34 +335,62 @@
 
             let sharedData = null, sharedMeta = [];
 
-            window.showStation = function (station, ll, el) {
-                if (activeMarkerElement) activeMarkerElement.classList.remove('active');
-                if (el) { el.classList.add('active'); activeMarkerElement = el; }
+            window.showStationModal = function (station, ll) {
+                $('#modal-station-name').text(station.nombre_estacion);
+                const fmt = new Intl.NumberFormat('es-CL');
+                $('#modal-utm').text(`${fmt.format(station.utm_este)} E | ${fmt.format(station.utm_norte)} N`);
+                
+                // Clear previous state
+                $('#param-selector').empty().selectpicker('refresh');
+                if (Highcharts.charts[0]) Highcharts.charts[0].destroy();
 
-                $('#side-station-name').text(station.nombre_estacion);
-                const fmt = new Intl.NumberFormat('es-CL', { minimumFractionDigits: 1 });
-                $('#val-utm').text(`${fmt.format(station.utm_este)} E | ${fmt.format(station.utm_norte)} N`);
-                $('#station-sidebar').addClass('active');
+                $('#chartModal').modal('show');
                 map.flyTo(ll, 14, { duration: 1.5 });
 
                 fetch(`{{ url('/api/estaciones-proyecto/station-history') }}/${station.id_estacion}`)
-                    .then(res => res.json()).then(res => {
-                        sharedData = res.data; sharedMeta = res.parametros;
-                        const $sel = $('#param-selector').empty();
-                        const valid = res.parametros.filter(p => res.data.some(d => d['parametro_' + p.id_parametro] && d['parametro_' + p.id_parametro] !== '―'))
-                            .sort((a, b) => a.nombre.localeCompare(b.nombre));
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.error) {
+                            console.error(res.error);
+                            return;
+                        }
 
-                        valid.forEach(p => $sel.append($('<option>', { value: p.id_parametro, text: p.nombre })));
-                        const ph = valid.find(p => p.nombre.toLowerCase().includes('ph'));
-                        $sel.val(ph ? ph.id_parametro : (valid[0] ? valid[0].id_parametro : null)).selectpicker('refresh');
-                        renderChart();
-                    });
+                        sharedData = res.data; 
+                        sharedMeta = res.parametros;
+                        
+                        const $sel = $('#param-selector').empty();
+                        
+                        // Populate selector with all available parameters
+                        if (res.parametros && res.parametros.length > 0) {
+                            res.parametros.forEach(p => {
+                                const normalized = window.normalizeText ? window.normalizeText(p.nombre) : p.nombre;
+                                $sel.append($('<option>', { 
+                                    value: p.id_parametro, 
+                                    text: p.nombre,
+                                    'data-tokens': normalized
+                                }));
+                            });
+                        }
+
+                        $sel.selectpicker('refresh');
+                        
+                        // Select "Sulfato" by default, or the first one if not found
+                        let defaultParam = res.parametros[0];
+                        const sulfato = res.parametros.find(p => p.nombre.toLowerCase().includes('sulfato'));
+                        if (sulfato) defaultParam = sulfato;
+                        
+                        $sel.val(defaultParam.id_parametro).selectpicker('refresh');
+                        
+                        setTimeout(renderChart, 500);
+                    })
+                    .catch(err => console.error("Error fetching station history:", err));
             };
 
             $('#param-selector').on('changed.bs.select', renderChart);
-            $('#close-sidebar').on('click', () => {
-                $('#station-sidebar').removeClass('active');
-                if (activeMarkerElement) { activeMarkerElement.classList.remove('active'); activeMarkerElement = null; }
+
+            $('#btn-limpiar-selector').on('click', function () {
+                $('#param-selector').val([]).selectpicker('refresh');
+                if (Highcharts.charts[0]) Highcharts.charts[0].destroy();
             });
 
             function renderChart() {
@@ -481,6 +398,7 @@
                 if (!ids || (Array.isArray(ids) && ids.length === 0)) return;
                 const selected = Array.isArray(ids) ? ids : [ids];
                 const series = [], yAxes = [];
+
                 selected.forEach((id, idx) => {
                     const meta = sharedMeta.find(m => String(m.id_parametro) === String(id));
                     const pts = sharedData.filter(d => d['parametro_' + id] && d['parametro_' + id] !== '―')
@@ -490,38 +408,56 @@
                         }).sort((a, b) => a[0] - b[0]);
 
                     if (pts.length) {
-                        series.push({ name: meta.nombre, data: pts, yAxis: idx, color: idx === 0 ? '#71b6f9' : '#00e5ff', marker: { radius: 4 }, tooltip: { valueSuffix: ' ' + meta.unidad, valueDecimals: 1 } });
+                        series.push({ 
+                            name: meta.nombre, 
+                            data: pts, 
+                            yAxis: idx, 
+                            color: idx === 0 ? '#0088cc' : '#2ecc71',
+                            marker: { radius: 4 },
+                            tooltip: { valueSuffix: ' ' + meta.unidad, valueDecimals: 1 }
+                        });
                         yAxes.push({
-                            title: { text: meta.nombre + ' [' + meta.unidad + ']', style: { color: idx === 0 ? '#71b6f9' : '#00e5ff', fontSize: '11px' } },
-                            gridLineColor: 'rgba(255,255,255,0.04)', labels: { style: { color: '#8d92a1', fontSize: '10px' } }, opposite: idx === 1
+                            title: { text: meta.nombre + ' [' + meta.unidad + ']', style: { color: idx === 0 ? '#0088cc' : '#2ecc71', fontSize: '14px', fontWeight: 'bold' } },
+                            gridLineColor: '#e2e8f0',
+                            gridLineDashStyle: 'Dash',
+                            labels: { style: { color: '#64748b', fontSize: '13px' } },
+                            opposite: idx === 1
                         });
                     }
                 });
 
                 Highcharts.chart('mini-chart', {
-                    chart: { backgroundColor: 'transparent' },
+                    chart: { backgroundColor: '#fff', style: { fontFamily: "'Inter', sans-serif" } },
                     title: { text: null },
-                    xAxis: { type: 'datetime', labels: { style: { color: '#8d92a1', fontFamily: "'Inter', sans-serif" } }, lineColor: 'rgba(255,255,255,0.08)' },
+                    xAxis: { 
+                        type: 'datetime', 
+                        labels: { style: { color: '#64748b', fontSize: '13px' } }, 
+                        lineColor: '#e2e8f0',
+                        gridLineWidth: 1,
+                        gridLineDashStyle: 'Dash',
+                        gridLineColor: '#f1f5f9'
+                    },
                     yAxis: yAxes,
-                    legend: { itemStyle: { color: '#e1e2e6', fontFamily: "'Inter', sans-serif", fontWeight: '400' } },
+                    legend: { itemStyle: { color: '#1e293b', fontWeight: '500', fontSize: '13px' } },
                     tooltip: {
                         shared: true,
-                        backgroundColor: 'rgba(22, 24, 45, 0.95)',
-                        borderWidth: 1,
-                        borderColor: 'rgba(255,255,255,0.1)',
+                        useHTML: true,
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        borderWidth: 1, 
+                        borderColor: '#e2e8f0', 
                         shadow: true,
-                        style: {
-                            fontSize: '13px',
-                            color: '#fff',
-                            fontFamily: "'Inter', sans-serif"
-                        },
-                        headerFormat: '<span style="font-size: 11px; color: #7d8bb2; font-weight: 700;">{point.key}</span><br/>',
-                        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b><br/>'
+                        headerFormat: '<span style="font-size: 10px; color: #64748b; font-weight: 700;">{point.key}</span><br/>',
+                        pointFormat: '<div style="margin-top: 4px;"><span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b></div>'
                     },
                     credits: { enabled: false },
                     series: series
                 });
             }
+            
+            // Re-render chart when modal is fully shown to avoid sizing issues
+            $('#chartModal').on('shown.bs.modal', function () {
+                if (sharedData) renderChart();
+            });
         });
     </script>
 @endpush

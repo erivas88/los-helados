@@ -6,14 +6,16 @@
    <!-- Intro Banner -->
    <div class="row" style="margin-bottom: 25px;">
       <div class="col-md-12">
-         <div style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #f39c12; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+         <div
+            style="background: linear-gradient(135deg, #ffffff 0%, #f1f4f9 100%); padding: 35px 40px; border-radius: 8px; border-left: 6px solid #f39c12; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                <div>
-                  <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
+                  <h2
+                     style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
                      <i class="fa fa-shield" style="color: #f39c12;"></i> Control de Calidad Analítico
                   </h2>
                   <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
-                     Revise exhaustivamente los registros, audite inconsistencias y aplique sellos de aprobación estandarizados.
+                      Verificación y validación de datos
                   </p>
                </div>
             </div>
@@ -25,7 +27,7 @@
    <div class="row">
       <div class="col-md-12">
          <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-            
+
             <div class="panel-body">
                <!-- Filter Toolbar -->
                <div class="filter-toolbar" style="margin-bottom: 20px;">
@@ -89,15 +91,9 @@
                      <!-- Buttons as equal items -->
                      <div class="filter-item">
                         <label class="filter-label">&nbsp;</label>
-                        <button type="button" id="btn-filtrar" class="btn btn-warning filter-btn btn-block" style="background-color: #f39c12; border-color: #f39c12; font-family: 'Outfit', sans-serif; font-weight: 600; color: white;">
+                        <button type="button" id="btn-filtrar" class="btn btn-warning filter-btn btn-block"
+                           style="background-color: #f39c12; border-color: #f39c12; font-family: 'Outfit', sans-serif; font-weight: 600; color: white;">
                            <i class="fa fa-filter text-success mr-1"></i> &nbsp; Filtrar
-                        </button>
-                     </div>
-                     <div class="filter-item">
-                        <label class="filter-label">&nbsp;</label>
-                        <button type="button" id="btn-load" class="btn btn-success filter-btn btn-block"
-                           data-toggle="modal" data-target="#modalCargar">
-                           <i class="fa fa-cloud mr-1"></i>&nbsp; Cargar
                         </button>
                      </div>
                      <div class="filter-item">
@@ -181,8 +177,8 @@
                      <div class="filter-item">
                         <label class="filter-label"><i class="fa fa-balance-scale text-success"></i> NORMA</label>
                         <select multiple id="filtro-norma-chart" class="form-control selectpicker" data-live-search="true"
-                           data-width="100%" title="Seleccionar normas" data-actions-box="true" data-selected-text-format="count > 1"
-                           data-count-selected-text="({0}) normas">
+                           data-width="100%" title="Seleccionar normas" data-actions-box="true"
+                           data-selected-text-format="count > 1" data-count-selected-text="({0}) normas">
                            <!-- Dynamic -->
                         </select>
                      </div>
@@ -1780,8 +1776,9 @@
                $('#filtro-norma-chart').append($('<option>', { value: n.id_norma, text: n.nombre }));
             });
             $.each(data.parametros, function (i, p) {
-               $('#filtro-parametros-chart').append($('<option>', { value: p.id_parametro, text: p.nombre }));
-               $('#filtro-parametros-qaqc').append($('<option>', { value: p.id_parametro, text: p.nombre }));
+               const normalized = window.normalizeText ? window.normalizeText(p.nombre) : p.nombre;
+               $('#filtro-parametros-chart').append($('<option>', { value: p.id_parametro, text: p.nombre, 'data-tokens': normalized }));
+               $('#filtro-parametros-qaqc').append($('<option>', { value: p.id_parametro, text: p.nombre, 'data-tokens': normalized }));
             });
             $('.selectpicker').selectpicker('refresh');
          });
@@ -2024,10 +2021,10 @@
                   yAxes.push({
                      title: {
                         text: chartMetaHist[pID].nombre_largo + ' [' + chartMetaHist[pID].unidad + ']',
-                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold' }
+                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold', fontSize: '14px' }
                      },
                      gridLineColor: '#f3f3f3',
-                     labels: { style: { color: '#666' } },
+                     labels: { style: { color: '#666', fontSize: '13px' } },
                      opposite: idx === 1,
                      plotLines: plotLines.length ? plotLines : undefined,
                      softMin: axisSoftMin,
@@ -2076,34 +2073,34 @@
             let axisHTML = '';
             currentHistoricalChart.yAxis.forEach((ax, i) => {
                axisHTML += `
-                                 <div class="cfg-group-card" style="background: #fff; border: 1px solid #f0f0f0; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                                       <span style="font-size: 9px; font-weight:700; color:#999; text-transform:uppercase; margin-bottom:4px; display:block;">EJE ${i === 0 ? 'PRIMARIO' : 'SECUNDARIO'}</span>
-                                       <div class="row">
-                                          <div class="col-xs-4"><label class="small text-muted">Lím. Sup</label><input type="number" class="form-control input-sm ax-u-hist" data-idx="${i}" value="${ax.max || ''}"></div>
-                                          <div class="col-xs-4"><label class="small text-muted">Lím. Inf</label><input type="number" class="form-control input-sm ax-l-hist" data-idx="${i}" value="${ax.min || ''}"></div>
-                                          <div class="col-xs-4"><label class="small text-muted">Invertir</label><div class="btn btn-default btn-xs btn-block ax-inv-hist ${ax.reversed ? 'btn-info' : ''}" data-idx="${i}" style="margin-top:2px;">INV</div></div>
-                                       </div>
-                                 </div>`;
+                                    <div class="cfg-group-card" style="background: #fff; border: 1px solid #f0f0f0; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                                          <span style="font-size: 9px; font-weight:700; color:#999; text-transform:uppercase; margin-bottom:4px; display:block;">EJE ${i === 0 ? 'PRIMARIO' : 'SECUNDARIO'}</span>
+                                          <div class="row">
+                                             <div class="col-xs-4"><label class="small text-muted">Lím. Sup</label><input type="number" class="form-control input-sm ax-u-hist" data-idx="${i}" value="${ax.max || ''}"></div>
+                                             <div class="col-xs-4"><label class="small text-muted">Lím. Inf</label><input type="number" class="form-control input-sm ax-l-hist" data-idx="${i}" value="${ax.min || ''}"></div>
+                                             <div class="col-xs-4"><label class="small text-muted">Invertir</label><div class="btn btn-default btn-xs btn-block ax-inv-hist ${ax.reversed ? 'btn-info' : ''}" data-idx="${i}" style="margin-top:2px;">INV</div></div>
+                                          </div>
+                                    </div>`;
             });
             $('#axes-config-container-hist').html(axisHTML);
 
             let seriesHTML = '';
             currentHistoricalChart.series.forEach((s, i) => {
                seriesHTML += `
-                                 <div class="cfg-group-card p-2" style="background: #fff; border: 1px solid #f0f0f0; padding: 15px; border-radius: 6px; margin-bottom: 8px;">
-                                       <div class="row no-gutters align-items-center">
-                                          <div class="col-xs-6"><span style="font-size: 10px; font-weight:700; color:#666;">${s.name}</span></div>
-                                          <div class="col-xs-2"><div style="background:${s.color}; width:100%; height:28px; border-radius:4px; border:1px solid #ddd; cursor:pointer;"><input type="color" class="s-c-hist" data-idx="${i}" value="${s.color}" style="opacity:0; width:100%; height:100%; cursor:pointer;"></div></div>
-                                          <div class="col-xs-4 pl-1">
-                                             <select class="form-control input-sm s-t-hist" data-idx="${i}">
-                                                   <option value="line" ${s.type === 'line' ? 'selected' : ''}>Line</option>
-                                                   <option value="spline" ${s.type === 'spline' ? 'selected' : ''}>Spline</option>
-                                                   <option value="column" ${s.type === 'column' ? 'selected' : ''}>Bars</option>
-                                                   <option value="area" ${s.type === 'area' ? 'selected' : ''}>Area</option>
-                                             </select>
+                                    <div class="cfg-group-card p-2" style="background: #fff; border: 1px solid #f0f0f0; padding: 15px; border-radius: 6px; margin-bottom: 8px;">
+                                          <div class="row no-gutters align-items-center">
+                                             <div class="col-xs-6"><span style="font-size: 10px; font-weight:700; color:#666;">${s.name}</span></div>
+                                             <div class="col-xs-2"><div style="background:${s.color}; width:100%; height:28px; border-radius:4px; border:1px solid #ddd; cursor:pointer;"><input type="color" class="s-c-hist" data-idx="${i}" value="${s.color}" style="opacity:0; width:100%; height:100%; cursor:pointer;"></div></div>
+                                             <div class="col-xs-4 pl-1">
+                                                <select class="form-control input-sm s-t-hist" data-idx="${i}">
+                                                      <option value="line" ${s.type === 'line' ? 'selected' : ''}>Line</option>
+                                                      <option value="spline" ${s.type === 'spline' ? 'selected' : ''}>Spline</option>
+                                                      <option value="column" ${s.type === 'column' ? 'selected' : ''}>Bars</option>
+                                                      <option value="area" ${s.type === 'area' ? 'selected' : ''}>Area</option>
+                                                </select>
+                                             </div>
                                           </div>
-                                       </div>
-                                 </div>`;
+                                    </div>`;
             });
             $('#series-config-container-hist').html(seriesHTML);
          }
@@ -2259,10 +2256,10 @@
                series: [
                   ...makeSeries(pointsCond),
                   { type: 'line', name: 'Recta m=1', data: [[0, 0], [maxCond, maxCond]], color: '#333', dashStyle: 'Solid', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', name: '±10%', data: [[0, 0], [maxCond, maxCond * 1.1]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0, 0], [maxCond, maxCond * 0.9]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false },
-                  { type: 'line', name: '±20%', data: [[0, 0], [maxCond, maxCond * 1.2]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0, 0], [maxCond, maxCond * 0.8]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
+                  { type: 'line', name: '±10%', id: 'qc-cond-10', data: [[0, 0], [maxCond, maxCond * 1.1]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'qc-cond-10', data: [[0, 0], [maxCond, maxCond * 0.9]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false },
+                  { type: 'line', name: '±20%', id: 'qc-cond-20', data: [[0, 0], [maxCond, maxCond * 1.2]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'qc-cond-20', data: [[0, 0], [maxCond, maxCond * 0.8]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
                ]
             });
 
@@ -2282,8 +2279,8 @@
                series: [
                   ...makeSeries(pointsPH),
                   { type: 'line', name: 'm = 1', data: [[0, 0], [maxPH, maxPH]], color: '#333', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', name: '±0.5 u pH', data: [[0, 0.5], [maxPH - 0.5, maxPH]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0.5, 0], [maxPH, maxPH - 0.5]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
+                  { type: 'line', name: '±0.5 u pH', id: 'qc-ph-05', data: [[0, 0.5], [maxPH - 0.5, maxPH]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'qc-ph-05', data: [[0.5, 0], [maxPH, maxPH - 0.5]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
                ]
             });
 
@@ -2486,10 +2483,10 @@
                series: [
                   ...makeSeries(pointsCond),
                   { type: 'line', name: 'Recta m=1', data: [[0, 0], [maxCond, maxCond]], color: '#333', dashStyle: 'Solid', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', name: '±10%', data: [[0, 0], [maxCond, maxCond * 1.1]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0, 0], [maxCond, maxCond * 0.9]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false },
-                  { type: 'line', name: '±20%', data: [[0, 0], [maxCond, maxCond * 1.2]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0, 0], [maxCond, maxCond * 0.8]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
+                  { type: 'line', name: '±10%', id: 'section-cond-10', data: [[0, 0], [maxCond, maxCond * 1.1]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'section-cond-10', data: [[0, 0], [maxCond, maxCond * 0.9]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false },
+                  { type: 'line', name: '±20%', id: 'section-cond-20', data: [[0, 0], [maxCond, maxCond * 1.2]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'section-cond-20', data: [[0, 0], [maxCond, maxCond * 0.8]], color: '#27ae60', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
                ]
             });
 
@@ -2501,8 +2498,8 @@
                series: [
                   ...makeSeries(pointsPH),
                   { type: 'line', name: 'm = 1', data: [[0, 0], [maxPH, maxPH]], color: '#333', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', name: '±0.5 u pH', data: [[0, 0.5], [maxPH - 0.5, maxPH]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
-                  { type: 'line', data: [[0.5, 0], [maxPH, maxPH - 0.5]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
+                  { type: 'line', name: '±0.5 u pH', id: 'section-ph-05', data: [[0, 0.5], [maxPH - 0.5, maxPH]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false },
+                  { type: 'line', linkedTo: 'section-ph-05', data: [[0.5, 0], [maxPH, maxPH - 0.5]], color: '#e74c3c', dashStyle: 'Dash', marker: { enabled: false }, enableMouseTracking: false, showInLegend: false }
                ]
             });
 

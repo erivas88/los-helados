@@ -1,4 +1,4 @@
-<div class="row">
+<!-- <div class="row">
     <div class="col-md-6 col-lg-6 col-xl-3">
         <section class="panel panel-featured-left panel-featured-primary">
             <div class="panel-body">
@@ -95,4 +95,4 @@
             </div>
         </section>
     </div>
-</div>
+</div>-->

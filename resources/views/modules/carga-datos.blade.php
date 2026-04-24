@@ -10,10 +10,10 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #2c3e50; margin-top: 0; margin-bottom: 8px; font-size: 28px;">
-                        <i class="fa fa-database" style="color: #0088cc;"></i> Explorador y Carga de Datos
+                        <i class="fa fa-database" style="color: #0088cc;"></i> Carga de Datos
                     </h2>
                     <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #5a6268; margin-bottom: 0;">
-                        Consulte los registros analíticos existentes en la base de datos o consolide nueva información.
+                           Cargue la información requerida en la base de datos
                     </p>
                 </div>
                 <div>
@@ -339,6 +339,29 @@
 <script src="https://cdn.jsdelivr.net/npm/highcharts@11/highcharts.js"></script>
 <script>
    $(document).ready(function () {
+    
+       Highcharts.setOptions({
+           lang: {
+               months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+               weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+               shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+               thousandsSep: '.',
+               decimalPoint: ',',
+               downloadPNG: 'Descargar imagen PNG',
+               downloadJPEG: 'Descargar imagen JPEG',
+               downloadPDF: 'Descargar documento PDF',
+               downloadSVG: 'Descargar imagen SVG',
+               printChart: 'Imprimir gráfico',
+               viewFullscreen: 'Ver en pantalla completa',
+               exportButtonTitle: 'Exportar gráfico',
+               contextButtonTitle: 'Menú contextual',
+               resetZoom: 'Restablecer zoom',
+               resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+               loading: 'Cargando...',
+               noData: 'No hay datos para mostrar'
+           },
+           chart: { style: { fontFamily: "'Inter', sans-serif" } }
+       });
    
        // Formateador para parámetros (miles: . , decimal: , )
        const paramFormatter = function(cell) {
