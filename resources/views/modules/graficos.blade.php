@@ -478,7 +478,9 @@
                             chartMeta = data.parametros_info;
                             chartNormaData = data.norma || null;
                             renderChart();
-                            buildModalConfig();
+                            if (currentChart) {
+                                buildModalConfig();
+                            }
                         });
                     });
                     function renderChart() {
@@ -510,6 +512,14 @@
                                         data: pts,
                                         yAxis: (useDual && idx > 0) ? 1 : 0,
                                         type: 'line',
+                                        marker: { enabled: true, radius: 4 },
+                                        dataLabels: {
+                                            enabled: true,
+                                            formatter: function () {
+                                                return this.point.options && this.point.options[2] ? this.point.options[2] : null;
+                                            },
+                                            style: { fontSize: '12px', fontWeight: '600', textOutline: '1px contrast' }
+                                        },
                                         unit: chartMeta[pID].unidad
                                     });
                                 }
@@ -581,10 +591,10 @@
                                 yAxes.push({
                                     title: {
                                         text: chartMeta[pID].nombre_largo + ' [' + chartMeta[pID].unidad + ']',
-                                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold' }
+                                        style: { color: idx === 0 ? '#337ab7' : '#5cb85c', fontWeight: 'bold', fontSize: '14px' }
                                     },
                                     gridLineColor: '#f3f3f3',
-                                    labels: { style: { color: '#666' } },
+                                    labels: { style: { color: '#666', fontSize: '13px' } },
                                     opposite: idx === 1,
                                     plotLines: plotLines.length ? plotLines : undefined,
                                     softMin: axisSoftMin,
@@ -598,26 +608,44 @@
                         }
 
                         currentChart = Highcharts.chart('main-chart', {
-                            chart: { borderWidht: 0, spacingTop: 20 },
+                            chart: { borderWidth: 0, spacingTop: 20 },
                             title: { text: null },
                             subtitle: {
-                                text: chartNormaData?.nombres ? 'Normas activas: ' + Object.values(chartNormaData.nombres).join(', ') : null
+                                text: chartNormaData?.nombres ? 'Normas activas: ' + Object.values(chartNormaData.nombres).join(', ') : null,
+                                style: { fontSize: '14px', color: '#555' }
                             },
-                            xAxis: { type: 'datetime' },
+                            xAxis: {
+                                type: 'datetime',
+                                labels: { style: { fontSize: '13px', color: '#333' } },
+                                title: { text: $('#cfg-xaxis-title').val() || 'Fecha', style: { fontSize: '15px', fontWeight: '700', color: '#333' } }
+                            },
                             yAxis: yAxes,
+                            plotOptions: {
+                                series: {
+                                    dataLabels: {
+                                        enabled: true,
+                                        formatter: function () {
+                                            return this.point.options && this.point.options[2] ? this.point.options[2] : null;
+                                        },
+                                        style: { fontSize: '12px', fontWeight: '600', textOutline: '1px contrast' }
+                                    }
+                                }
+                            },
                             tooltip: {
                                 shared: true,
                                 useHTML: true,
+                                style: { fontSize: '13px' },
                                 formatter: function () {
                                     let s = `<b>${Highcharts.dateFormat('%Y-%m-%d', this.x)}</b><br/>`;
                                     this.points.forEach(p => {
                                         let unitStr = p.series.userOptions.unit ? ' ' + p.series.userOptions.unit : '';
-                                        s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${p.point.options[2]}${unitStr}</b><br/>`;
+                                        let rawValue = p.point.options && p.point.options[2] ? p.point.options[2] : p.y;
+                                        s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${rawValue}${unitStr}</b><br/>`;
                                     });
                                     return s;
                                 }
                             },
-                            legend: { enabled: true },
+                            legend: { enabled: true, itemStyle: { fontSize: '13px' } },
                             series: series,
                             exporting: {
                                 enabled: true,
@@ -632,6 +660,9 @@
                     }
 
                     function buildModalConfig() {
+                        if (!currentChart) {
+                            return;
+                        }
                         // AXES
                         let axisHTML = '';
                         currentChart.yAxis.forEach((ax, i) => {

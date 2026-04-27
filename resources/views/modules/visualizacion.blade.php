@@ -24,7 +24,7 @@
    </div>
 
    <!-- Main Row -->
-   <div class="row" style="display: none">
+   <div class="row" style="display: block">
       <div class="col-md-12">
          <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
             <div class="panel-body" style="padding: 25px;">
@@ -98,81 +98,7 @@
       </div>
    </div>
    <!-- Historical Chart Row -->
-   <div class="row">
-      <div class="col-md-12">
-         <section class="panel" style="border-radius: 8px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-            <div class="panel-body" style="padding: 25px;">
-               <h3
-                  style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #f1f4f9; padding-bottom: 10px;">
-                  <i class="fa fa-line-chart text-success"></i> Gráficos Analíticos
-               </h3>
-               <!-- Filter Toolbar for Chart -->
-               <div class="filter-toolbar" style="margin-bottom: 20px;">
-                  <div class="flex-toolbar-container">
-                     <!-- Sector -->
-                     <div class="filter-item">
-                        <label class="filter-label"><i class="fa fa-industry text-success"></i> SECTOR</label>
-                        <select id="select-sector-chart" class="form-control selectpicker" data-live-search="true"
-                           data-width="100%">
-                           <!-- Dynamic -->
-                        </select>
-                     </div>
-                     <!-- Estaciones -->
-                     <div class="filter-item">
-                        <label class="filter-label"><i class="fa fa-map-marker text-success"></i> ESTACIONES</label>
-                        <select multiple id="filtro-estaciones-chart" class="form-control selectpicker" title="Estaciones"
-                           data-size="5" data-live-search="true" data-width="100%" data-dropup-auto="false"
-                           data-selected-text-format="count" data-count-selected-text=" ({0}) Estaciones "
-                           data-actions-box="true" data-select-all-text="Todos" data-deselect-all-text="Ninguno">
-                        </select>
-                     </div>
-                     <!-- Parámetros -->
-                     <div class="filter-item">
-                        <label class="filter-label"><i class="fa fa-flask text-success"></i> PARÁMETROS</label>
-                        <select multiple id="filtro-parametros-chart" class="form-control selectpicker"
-                           title="Seleccionar Parámetros" data-live-search="true" data-width="100%" data-size="5"
-                           data-actions-box="true" data-select-all-text="Todos" data-deselect-all-text="Ninguno"
-                           data-selected-text-format="count > 1" data-count-selected-text="({0}) Parámetros">
-                        </select>
-                     </div>
-                     <!-- Programas -->
-                     <div class="filter-item">
-                        <label class="filter-label"><i class="fa fa-tasks text-success"></i> PROGRAMAS</label>
-                        <select multiple id="filtro-indicador-chart" class="form-control selectpicker"
-                           data-live-search="true" data-width="100%">
-                           <!-- Dynamic -->
-                        </select>
-                     </div>
-
-                     <!-- Norma -->
-                     <div class="filter-item">
-                        <label class="filter-label"><i class="fa fa-balance-scale text-success"></i> NORMA</label>
-                        <select multiple id="filtro-norma-chart" class="form-control selectpicker" data-live-search="true"
-                           data-width="100%" title="Seleccionar normas" data-actions-box="true"
-                           data-selected-text-format="count > 1" data-count-selected-text="({0}) normas">
-                           <!-- Dynamic -->
-                        </select>
-                     </div>
-                     <!-- Graficar Button -->
-                     <div class="filter-item">
-                        <label class="filter-label">&nbsp;</label>
-                        <button type="button" id="btn-graficar" class="btn btn-success filter-btn btn-block">
-                           <i class="fa fa-line-chart mr-1"></i> &nbsp; Graficar
-                        </button>
-                     </div>
-                  </div>
-               </div>
-               <!-- Chart Container -->
-               <div id="chart-historico" style="height: 500px; width: 100%;">
-                  <div class="text-center" style="padding-top: 150px; color: #999;">
-                     <i class="fa fa-line-chart fa-5x" style="opacity: 0.2; margin-bottom: 20px;"></i>
-                     <h4>Seleccione estaciones y parámetros para visualizar el histórico.</h4>
-                  </div>
-               </div>
-            </div>
-         </section>
-      </div>
-   </div>
+   
 @endsection
 @push('css')
    <link rel="stylesheet"
